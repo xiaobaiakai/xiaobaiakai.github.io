@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lzer0kx.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="java面向对象基础篇">
+<meta property="og:type" content="article">
+<meta property="og:title" content="javase-面向对象基础篇">
+<meta property="og:url" content="http://lzer0kx.top/2023/01/05/javase(2)/index.html">
+<meta property="og:site_name" content="Lzer0Kx的信安之路">
+<meta property="og:description" content="java面向对象基础篇">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_lJUy0piowE.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_aDqDqBrq6D.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_2arOnbWJB0.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_-FWpvinxF0.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_mflo6OtZdL.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_FJp10-eXj0.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_0i2309DpKE.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_220EqyB3fd.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_sSjSxHItsg.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_5nUMmbmJNl.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_ph7USDYX59.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_afKWVy_1Oz.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_zKAQst-lFE.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_iFKlPFx73J.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_kqzY_pE1vK.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_qUk9WuUaqm.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_hGV_jNMFGG.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_XENjWZKgJk.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_RPAQSa0FE9.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_SyfjtqaQO3.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_4s9jFlI7oQ.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_7TNyIgCS2O.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_1bc3KXQzEE.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_zuQMlfu489.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87__QAPnsNWQ1.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_WJ80xxk2Cd.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_XNIEmLG1iJ.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_sAIZe4uskD.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Pk2QCZ7ueV.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_l1WO06cH7l.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_j9Wrcc2kxF.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_5rcqCZuLcr.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_E0_PjfNJ4q.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_CqlAhrHrSK.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_K0UpB7REnR.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_2gDz6Jup02.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_qJr-nrgGO9.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_D5F41H30_e.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_WwgCrOaesy.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_cEj9IPHjHD.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_vCTHrcnPmG.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_m6dr1Jw6OH.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_d4U19fXRIC.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_YmV49fPh5Y.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_eK5U1ts3_w.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_-wJhFMU45H.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_fq5iVjSy5t.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_adaEtB-ip1.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_KlVH53rRGf.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_749TsgbtHs.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_4c1DP5VvVT.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_tGkpITafrq.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_iZI2VrLzwe.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Vkp2qPIZL-.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_n3-AkKV576.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_LyVrfZEE9R.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_OSTldinuUY.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_zKbXF1FgH3.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_qT1L3WWuF_.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_6-MzHictry.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_NNdsMn7Pev.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Js2LDlMP1W.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_R481Xq_KLa.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_wVYrcx1HD7.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_4VyInmHxuQ.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_OmaXopiqF3.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_wrNOGJ6ZYE.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_mKOe_-rot4.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_VAJQGkE1zW.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_me-AtfZaZg.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_EOygtJjsar.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_K61B_XPboX.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_xDTrhUjUkB.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_oMRxrxmf_i.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Taea5khJbw.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_HZ350t0B_C.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_UelB2XogN8.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_M-MH7Km50Z.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_STJmOdGthu.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_9tXcd5BxTh.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_cyUidswdfG.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_HIgvbxL1Bo.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Dxh-MRf1UA.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Im5NvPhfps.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_8w0s_WYHBe.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Xa9u_zBGHL.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_b4_-fkfntd.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_39lFCX64hz.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_SFRNrK7D-L.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_WrdoJcWQjx.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_mo87ces8p_.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_tyuHVhnOc6.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Wc_COvzaLT.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_2P8HWn2EvS.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_tPMrDE_MG7.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_bTarnGtTn6.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_cAkBi36eDU.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_5sU7x6ytXy.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_ypRGQNbArh.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_VjRRF6Cchq.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_XKnDtQTrOg.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Mi3dRuJec5.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_VYKUj3sDfz.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_t5x_hrFIf_.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_2z7mcR6wGT.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_mkUhySoCzX.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Cfg6YsxbRN.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_kVHp-KRuoy.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_iMSgboAx_h.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_4iZihT0cXY.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_cTXM1Qavac.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_eFMqoRgQcT.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_vK7rQLdbSb.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_4gaYdrowm9.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_mIQwtKGvMh.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_wNvv38gaAg.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_PcrnsbZbvM.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_NutWOwtLvT.png">
+<meta property="og:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_7tvmMLk6L6.png">
+<meta property="article:published_time" content="2023-01-05T07:12:36.000Z">
+<meta property="article:modified_time" content="2023-01-05T07:13:29.853Z">
+<meta property="article:author" content="Lzer0Kx">
+<meta property="article:tag" content="java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://lzer0kx.top/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_lJUy0piowE.png">
+
+<link rel="canonical" href="http://lzer0kx.top/2023/01/05/javase(2)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>javase-面向对象基础篇 | Lzer0Kx的信安之路</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Lzer0Kx的信安之路</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lzer0kx.top/2023/01/05/javase(2)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lzer0Kx">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lzer0Kx的信安之路">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          javase-面向对象基础篇
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-01-05 15:12:36 / 修改时间：15:13:29" itemprop="dateCreated datePublished" datetime="2023-01-05T15:12:36+08:00">2023-01-05</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>java面向对象基础篇</p>
+<span id="more"></span>
+
+<h3 id="类和对象"><a href="#类和对象" class="headerlink" title="类和对象"></a>类和对象</h3><h4 id="类与对象的创建"><a href="#类与对象的创建" class="headerlink" title="类与对象的创建"></a>类与对象的创建</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">类</span><br><span class="line">类是一个模板 描述一类对象的行为和状态</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>对象和类</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_lJUy0piowE.png"></p>
+<p>如上图 汽车为类(class) 具体的每辆车为该汽车类的对象(object)</p>
+<p>对象包含了汽车的颜色，品牌，名称</p>
+<p>java中的类</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_aDqDqBrq6D.png"></p>
+<p>关于对象和类  这个例子生动形象</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_2arOnbWJB0.png"></p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_-FWpvinxF0.png"></p>
+<p>创建一个简单的类来演示一下java中类的定义</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_mflo6OtZdL.png"></p>
+<p>像dog类中定义的size age等是这个类的属性 eat等是类的方法</p>
+<p>那么这些变量什么时候被赋值 当它们只有在一个具体的对象中才可以使用</p>
+<p>创建好属性之后 我们可以尝试创建一个实例对象 实例对象现在现在对应的就是一个具体的人</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">new 类名();</span><br></pre></td></tr></table></figure>
+
+<h4 id="对象的使用"><a href="#对象的使用" class="headerlink" title="对象的使用"></a>对象的使用</h4><p>上节课我们已经懂了如何去创建一个实例对象 那么现在创建好之后 想要去使用这个对象(比如查看或修改它的名字)</p>
+<p>比如我们定义好Person类</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_FJp10-eXj0.png"></p>
+<p>在另一个类中实例化了(new)了Person类</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_0i2309DpKE.png"></p>
+<p>就可以使用Person类的属性</p>
+<p>说几点需要注意的</p>
+<p>不同对象的属性是分开独立存放的 每个对象都有一个自己的空间 修改一个对象的属性并不会影响到其它对象</p>
+<p>这种是互不影响的</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_220EqyB3fd.png"></p>
+<p>对于对象类型的变量 可以不对任何对象进行引用 但是会报错</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_sSjSxHItsg.png"></p>
+<p>对象刚创建成功时 它的属性没有进行赋值 但是前面说过变量使用之前必须先赋值 那么创建对象之后能直接访问嘛</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_5nUMmbmJNl.png"></p>
+<p>如果直接创建对象 对象的属性都会存在初始值</p>
+<p>如果是基本类型 默认统一为0</p>
+<p>如果是引用类型 默认是null</p>
+<h4 id="方法的创建和使用"><a href="#方法的创建和使用" class="headerlink" title="方法的创建和使用"></a>方法的创建和使用</h4><p>前面我们我们定义的这些name之类的叫做属性 但是对象还需要一定的行为 比如人可以行走，跳跃等等</p>
+<p>对象的一些行为 我们可以通过定义方法来实现</p>
+<p>方法的定义</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">返回值类型 方法名称()&#123;</span><br><span class="line">    方法体...</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>举一个简单小栗子</p>
+<p>我们在persion类中定义了hello方法</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_ph7USDYX59.png"></p>
+<p>然后 我们在另一个类中实例化并调用它的方法</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_afKWVy_1Oz.png"></p>
+<p>上述就是最简单的一个定义类中方法并调用的例子</p>
+<p>那么我们要是想让这个对象学会加法运算呢</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_zKAQst-lFE.png"></p>
+<p>在另一个类中调用</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_iFKlPFx73J.png"></p>
+<p>定义方法时编写的参数 我们称为形式参数 而调用方法实际传入的参数 称为实际参数</p>
+<p>学到这里 有一种我好像真的在操控一个对象的感觉</p>
+<p>关于return关键字</p>
+<p>在使用return关键字之后 方法直接结束并返回结果 在这之后编写的任何代码 都是不可到达的</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_kqzY_pE1vK.png"></p>
+<p>return 后编写代码 会导致编译不通过 因为存在不可达语句</p>
+<p>如果程序中出现分支语句 必须保证每一个分支都要有返回值才可以</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_qUk9WuUaqm.png"></p>
+<p>还有一个参数问题</p>
+<p>举个例子</p>
+<p>定义一个这种方法</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_hGV_jNMFGG.png"></p>
+<p>然后调用</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_XENjWZKgJk.png"></p>
+<p>但是我们惊奇的发现 a和b的值并没有发生交换</p>
+<p>实际上这里仅仅是将值复制给了方法里面的变量(相当于变量赋值)</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_RPAQSa0FE9.png"></p>
+<p>所以说我们仅仅交换的是方法里的a和b 参数传递仅仅是值传递 没有办法去操作到外面的a和b a b都是基本类型</p>
+<p>继续看一个例子</p>
+<p>在persion类中定义</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_SyfjtqaQO3.png"></p>
+<p>接着在另一个类中调用</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_4s9jFlI7oQ.png"></p>
+<p>但是这里为什么就修改成功了呢</p>
+<p>我们前面说过 引用类型的变量，仅仅存放的是对象的引用 而不是对象本身 这里进行的值传递就相当于将对象的引用复制到方法内部的变量中 而这个内部的变量 依然是引用的同一个对象</p>
+<h4 id="方法进阶"><a href="#方法进阶" class="headerlink" title="方法进阶"></a>方法进阶</h4><p>有些时候我们的方法中可能会出现一些与成员变量重名的变量</p>
+<p>比如这种情况</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_7TNyIgCS2O.png"></p>
+<p>在其它类调用时</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_1bc3KXQzEE.png"></p>
+<p>我们可以看到 name依然是没有修改的状态 因为出现重名的时候 默认情况会优先使用作用域最近的变量</p>
+<p>我们要想在方法中访问到当前对象的属性，可以使用this关键字</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_zuQMlfu489.png"></p>
+<p>这个时候就可以访问到了</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87__QAPnsNWQ1.png"></p>
+<p>方法重载</p>
+<p>有些情况 参数类型可能会多种多样 我们的方法要能够同时应对多种情况</p>
+<p>比如我们前面举过的一个例子</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_WJ80xxk2Cd.png"></p>
+<p>在其它类中调用可以计算整数加法 那么这个时候问题又来了</p>
+<p>怎么计算小数呢</p>
+<p>这个时候就需要将这个方法进行重载</p>
+<p>一个类中可以包含多个同名的方法 需要的形式参数不一样 方法的返回类型 可以相同也可以不同 但是仅返回类型不同是不允许的</p>
+<p>例子 为了支持小数加法 我们对set方法进行重载</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_XNIEmLG1iJ.png"></p>
+<p>现在其他类调用就可以进行小数加法了</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_sAIZe4uskD.png"></p>
+<p>方法之间也可以进行相互调用</p>
+<p>这样 是被允许的</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Pk2QCZ7ueV.png"></p>
+<p>但是 如果互相调用</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_l1WO06cH7l.png"></p>
+<p>这就死循环了 导致报错</p>
+<p>方法自己也可以调用自己 我们称为递归调用 如果操作不当会导致栈溢出错误 如果我们给其合理的设置出口 还是很好用的</p>
+<p>比如 计算1加到100的和</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_j9Wrcc2kxF.png"></p>
+<p>调用</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_5rcqCZuLcr.png"></p>
+<p>这就是一种递归调用</p>
+<p>打个断点调试一下过程 和我们想的一样</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_E0_PjfNJ4q.png"></p>
+<h4 id="构造方法"><a href="#构造方法" class="headerlink" title="构造方法"></a>构造方法</h4><p>前面讲到在创建对象 都是直接使用new关键词直接搞定的 但是发现 对象在创建之后 各种属性都是默认值&amp;#x20;</p>
+<p>那么能否实现在对象创建时就为其指定姓名，年龄，性别等等 要在对象创建时进行处理 可以使用构造方法(构造器)完成</p>
+<p>每个类中其实都有一个默认的构造方法</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public Persion()&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>构造方法不需要填写返回值 方法名称和类名相同</p>
+<p>默认情况下每个类都会自带一个没有任何参数的无参构造方法 当然我们也可以手动声明 对其进行修改</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_CqlAhrHrSK.png"></p>
+<p>构造方法在new的时候自动执行</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_K0UpB7REnR.png"></p>
+<p>也可以为构造方法设定参数</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_2gDz6Jup02.png"></p>
+<p>我们自己定义一个构造方法之后 会覆盖掉默认的那一个无参构造方法</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_qJr-nrgGO9.png"></p>
+<p>要给成员变量设定初始值 不仅可以通过构造方法 也可以直接在定义时赋值</p>
+<p>我们也可以在类中添加代码块 代码块同样会在对象构造之前进行 在对象变量初始化之后执行</p>
+<h4 id="静态变量和静态方法"><a href="#静态变量和静态方法" class="headerlink" title="静态变量和静态方法"></a>静态变量和静态方法</h4><p>一个类可以具有多种属性 行为 包括对象该如何创建 我们可以通过构造方法进行设定</p>
+<p>可以通过类创建对象 每个对象都会具有我们在类中设定好的属性 包括我们设定好的行为</p>
+<p>如果说类是一个模板 那我们就可以通过这个模板捏造出一个又一个对象</p>
+<p>静态变量 我们使用static关键字来声明一个变量或一个方法为静态的</p>
+<p>一旦声明为静态 可以通过这个类创建的所有对象 操作的都是同一个目标 一个对象改变了静态变量的值 那么其它对象读取的就是被改变的值 总得来说 我们前面学习都是对于对象来说的 但静态变量是对类来说的</p>
+<p>举个例子</p>
+<p>这里我们定义一个info静态变量</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_D5F41H30_e.png"></p>
+<p>测试一下</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_WwgCrOaesy.png"></p>
+<p>可以看到 静态属性info是属于persion类的 因此无论通过什么方式 改变的都是同一个目标</p>
+<p>这就印证上面我们说的 并不会通过一个具体的对象去修改和使用静态属性 而是通过这个类去使用</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_cEj9IPHjHD.png"></p>
+<p>我们也可以把方法标记为静态</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_vCTHrcnPmG.png"></p>
+<p>静态方法属于类 在静态方法中无法获取成员变量的值</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_m6dr1Jw6OH.png"></p>
+<p>但是静态方法可以访问到静态变量的</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_d4U19fXRIC.png"></p>
+<p>因为他们都属于类</p>
+<p>代码块同样也可以变成静态的</p>
+<p>还有个问题 静态变量是什么时候进行初始化的</p>
+<p>举个例子</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_YmV49fPh5Y.png"></p>
+<p>主方法中创建一个对象 观察这几步怎么执行</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_eK5U1ts3_w.png"></p>
+<p>静态内容在对象构造之前就完成了初始化</p>
+<p>如果我们直接访问类的静态变量</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_-wJhFMU45H.png"></p>
+<p>在使用时 先把静态内容初始化之后才得到值</p>
+<p>如果我们压根不去使用这个类的话 那也不会被初始化</p>
+<h3 id="包和访问控制"><a href="#包和访问控制" class="headerlink" title="包和访问控制"></a>包和访问控制</h3><h4 id="包声明和导入"><a href="#包声明和导入" class="headerlink" title="包声明和导入"></a>包声明和导入</h4><p>随着我们程序不断变大 可能会创建各种各样的类 它们可能会做不同的事情 那么这些类都放在一起的话会很混乱 我们可以通过包的形式将这些类进行分类存放</p>
+<p>包其实就是用来区分位置的东西 也可以用来将我们的类进行分类</p>
+<p>命名规则</p>
+<p>英文+数字 最好是一个域名的形式</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_fq5iVjSy5t.png"></p>
+<p>创建</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_adaEtB-ip1.png"></p>
+<p>创建好包之后 我们需要把类放到包中</p>
+<p>要用package关键字来指明当前类所处的包</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_KlVH53rRGf.png"></p>
+<p>当我们使用同一个包中的类时 直接使用即可 当我们需要使用其他包中的类时 需要先导入</p>
+<p>使用import关键字导入我们所需要的类&amp;#x20;</p>
+<p>import + 类名</p>
+<p>一个包中有多个类 我们可以使用*表示导入这个包中全部的类</p>
+<p>需要注意的是 在不同包下的类 即使类名相同 也是不同的两个类</p>
+<h4 id="访问控制权限"><a href="#访问控制权限" class="headerlink" title="访问控制权限"></a>访问控制权限</h4><p>在上一章的末尾 我们在导入包之后遇到一个问题</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_749TsgbtHs.png"></p>
+<p>下面就介绍java访问控制权限</p>
+<p>访问控制修饰符</p>
+<p>java中 可以使用访问控制符来保护对类，变量，方法和构造方法的访问</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">default 默认 在同一包内可见 不使用任何修饰符</span><br><span class="line">使用对象 类，接口，变量，方法</span><br><span class="line"></span><br><span class="line">private 在同一类内可见</span><br><span class="line">使用对象 变量，方法</span><br><span class="line">不能修饰类</span><br><span class="line"></span><br><span class="line">public 对所有类可见</span><br><span class="line">使用对象 类，接口，变量，方法</span><br><span class="line"></span><br><span class="line">protected 对同一包内的类和所有子类可见</span><br><span class="line">使用对象 变量，方法</span><br><span class="line">不能修饰类</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="封装-继承和多态"><a href="#封装-继承和多态" class="headerlink" title="封装 继承和多态"></a>封装 继承和多态</h3><p>封装，继承和多态是面向对象编程的三大特性</p>
+<h4 id="类的封装"><a href="#类的封装" class="headerlink" title="类的封装"></a>类的封装</h4><p>简单来说就是把对象的属性和方法结合成一个独立的整体 隐藏实现细节 并提供对外访问的接口</p>
+<p>封装主要还是为了保证变量的安全性 如果类中的实例变量可以直接查看和修改 可能给整个代码带来不好的体验 因此在编写类的时候一般将成员变量私有化 外部类需要使用Getter和Setter方法来查看和设置变量</p>
+<p>举个例子</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_4c1DP5VvVT.png"></p>
+<p>在其他类只能通过调用getName()方法来获取名字</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_tGkpITafrq.png"></p>
+<p>外部现在只能通过调用定义的方法来获取成员属性 而别人也可以在方法中进行一些额外的操作</p>
+<p>小明可以修改名字 但是不能包含小字</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_iZI2VrLzwe.png"></p>
+<p>也可以将构造方法改成私有的 通过我们内部的方式来构造对象</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Vkp2qPIZL-.png"></p>
+<h4 id="类的继承"><a href="#类的继承" class="headerlink" title="类的继承"></a>类的继承</h4><p>在定义不同类的时候存在一些相同属性 为了方便使用可以把这些共同属性抽象成一个父类 在定义其它子类时可以继承该父类 减少代码的重复定义 子类可以使用父类中非私有的成员</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_n3-AkKV576.png"></p>
+<p>上图这些划分出来的类 本质还是人类 具有人类具有的属性 这些划分出来的类同样具有</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_LyVrfZEE9R.png"></p>
+<p>接着我们可以创建各种各样的子类 想要继承一个类 使用extends关键字</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_OSTldinuUY.png"></p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_zKbXF1FgH3.png"></p>
+<p>类的继承可以不断向下 但是同时只能继承一个类 标记为final的类不允许被继承</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_qT1L3WWuF_.png"></p>
+<p>当一个类继承另一个类时 属性会被继承 可以直接访问父类中定义的属性 除非父类中将属性的访问权限设定为private 虽然子类是继承了这个属性的 但是还是无法访问</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_6-MzHictry.png"></p>
+<p>在父类中定义的方法同样会被子类继承</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_NNdsMn7Pev.png"></p>
+<p>子类直接获得了此方法 当我们创建一个子类对象时可以直接使用这个方法</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Js2LDlMP1W.png"></p>
+<p>这个继承还是非常的有人性化 就好像儿子会继承爸爸的特点 然后也有自己独特的特点</p>
+<p>如果父类存在一个有参构造方法 子类必须在构造方法中调用</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_R481Xq_KLa.png"></p>
+<p>此时两个子类都报错了</p>
+<p>因为子类在构造时 不仅要初始化子类的属性 还需要初始化父类的属性 所以说在默认情况下 子类是调用了父类的构造方法的 只是在无参的情况下可以省略 但是现在父类构造方法需要参数 就需要我们手动指定</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_wVYrcx1HD7.png"></p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_4VyInmHxuQ.png"></p>
+<p>在使用子类时 也可以将其当作父类来使用 当然仅仅是当作父类使用 不是说彻底就变成了父类</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_OmaXopiqF3.png"></p>
+<p>这里也可以使用强制类型转换 将一个被当作父类使用的子类对象 转换回子类</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_wrNOGJ6ZYE.png"></p>
+<p>但是这种方式只适用于这个对象本身就是对应的子类才可以 如果本身都不是这个子类 或者父类就会出问题</p>
+<p>如果我们要判断一下某个变量所引用的对象是什么类 该怎么办</p>
+<p>使用instanceof关键字</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_mKOe_-rot4.png"></p>
+<p>如果变量所引用的对象是对应类型或是对应类型的子类 那么instanceof都会返回true 否则返回false</p>
+<p>还需要声明一下 子类是可以定义和父类同名的属性</p>
+<p>举个例子</p>
+<p>子类</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_VAJQGkE1zW.png"></p>
+<p>父类</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_me-AtfZaZg.png"></p>
+<p>调用</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_EOygtJjsar.png"></p>
+<p>很明显 这个name用的就是父类定义的</p>
+<p>这时我们在子类定义一个name</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_K61B_XPboX.png"></p>
+<p>再次运行</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_xDTrhUjUkB.png"></p>
+<p>有限使用了子类内部定义的变量name</p>
+<p>那么问题又来了 在子类存在同名变量的情况下 怎么去访问父类 可以使用super关键字来表示父类</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_oMRxrxmf_i.png"></p>
+<p>再次访问</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Taea5khJbw.png"></p>
+<h4 id="Object类"><a href="#Object类" class="headerlink" title="Object类"></a>Object类</h4><p>实际上所有的类都默认继承自Object类 除非手动指定继承的类型 但是最顶层的父类依然还是Object类</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_HZ350t0B_C.png"></p>
+<p>Object类中有很多方法 在这里都不一一展示了 打开object类只需要ctrl+n然后搜索object就好</p>
+<p>调用object类提供的toString()方法</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_UelB2XogN8.png"></p>
+<p>也可以试试默认提供的equals方法</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_M-MH7Km50Z.png"></p>
+<p>默认比较的是两个对象是否是同一个对象 这里得到的结果是false 但是有些情况如果名字 年龄 性别都完全相同 那么这肯定是同一个人 为了达到这样的判断 我们要修改一个equals方法的默认实现来完成 这就要用到方法的重写</p>
+<p>Object类中提供的克隆方法</p>
+<p>实现接口</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_STJmOdGthu.png"></p>
+<p>将克隆方法的可见性提升一下&amp;#x20;</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_9tXcd5BxTh.png"></p>
+<p>实现</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_cyUidswdfG.png"></p>
+<p>原对象和克隆对象 是两个不同的对象 但是他们的各种属性都是完全一样的</p>
+<h4 id="方法的重写"><a href="#方法的重写" class="headerlink" title="方法的重写"></a>方法的重写</h4><p>方法的重写是覆盖原有的方法实现 比如现在我们不希望使用Object类中提供的equals方法 那么我们就可以将其重写了</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_HIgvbxL1Bo.png"></p>
+<p>在重写Object提供的equals方法之后 就会按照我们重写的方式判断</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Dxh-MRf1UA.png"></p>
+<p>此时由于三个属性完全一致 所以说判断结果为真 即使是两个不同的对象</p>
+<p>有时候为了方便查看对象的各个属性 我们可以将Object类提供的toString方法重写</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Im5NvPhfps.png"></p>
+<p>调用</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_8w0s_WYHBe.png"></p>
+<p>静态方法是不支持重写的 因为它属于类本身 但是它可以被继承</p>
+<p>基于方法可以重写的特性 对于一个类定义的行为 不同的子类会出现不同的行为</p>
+<p>例子</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Xa9u_zBGHL.png"></p>
+<p>子类重写</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_b4_-fkfntd.png"></p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_39lFCX64hz.png"></p>
+<p>不同的子类 对于同一个方法会产生不同的结果</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_SFRNrK7D-L.png"></p>
+<p>这也是面向对象编程中多态特性的一种体现</p>
+<p>如果我们不希望子类重写某个方法 我们可以在方法前添加final关键字 表示这个方法已经是最终形态</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_WrdoJcWQjx.png"></p>
+<p>如果 父类中方法的可见性是private 那么子类也无法访问 也不能重写 但是可以定义同名方法</p>
+<p>我们在重写父类方法时 如果希望调用父类原本的方法实现 那么同样可以使用super关键字</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_mo87ces8p_.png"></p>
+<p>子类在重写父类方法是 不能降低父类方法中的可见性</p>
+<p>因为子类实际上可以当作父类使用 如果子类的访问权限比父类还低 那么在被当作父类使用时 就可能出现无视访问权限调用的情况</p>
+<p>但是我们可以在子类中提升权限</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_tyuHVhnOc6.png"></p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Wc_COvzaLT.png"></p>
+<p>作为子类还可以正常调用 子类重写的方法权限不能比父类还低</p>
+<h4 id="抽象类"><a href="#抽象类" class="headerlink" title="抽象类"></a>抽象类</h4><p>越是处于顶层定义的类 实际上可以进一步的进行抽象</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_2P8HWn2EvS.png"></p>
+<p>实际上 人怎么考试是一个抽象的概念 而学生和工人怎么考试 才是具体的一个实现&amp;#x20;</p>
+<p>我们可以将人类进行进一步的抽象 让某些方法完全由子类来实现 父类中不需要提供实现</p>
+<p>要实现这样的操作 我们可以将人类变成抽象类</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_tPMrDE_MG7.png"></p>
+<p>通过添加abstract关键字 表示这个类是一个抽象类</p>
+<p>抽象类中可以具有抽象方法 也就是说这个方法只有定义 没有方法体</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_bTarnGtTn6.png"></p>
+<p>而具体的实现 需要由子类来完成 而且如果是子类 必须要实现抽象类中所有抽象方法</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_cAkBi36eDU.png"></p>
+<p>抽象类由于不是具体的类定义 可能会存在某些方法没有实现 因此无法直接通过new关键字来直接创建对象</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_5sU7x6ytXy.png"></p>
+<p>要使用抽象类 只能去创建它的子类对象</p>
+<p>抽象类一般只用作继承使用  抽象类的子类也可以是一个抽象类</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_ypRGQNbArh.png"></p>
+<p>但是注意到 抽象方法的访问权限不能为private</p>
+<p>因为抽象方法一定要由子类实现 如果私有的话 子类就都访问不了</p>
+<h4 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h4><p>接口只代表某个确切的功能 也就是只包含方法的定义 甚至都不是一个类</p>
+<p>接口一般只代表某些功能的抽象 接口包含了一些列方法的定义 类可以实现这个接口 表示类支持接口代表的功能</p>
+<p>怎么说呢 实际上接口的目的就是将类所具有某些行为抽象出来</p>
+<p>比如 对于人类的不同子类 学生和老师来说 都具有学习这个能力 那么我们就可以将学习这个能力抽象成接口来进行使用 只要是实现这个接口的类 都有学习的能力</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_VjRRF6Cchq.png"></p>
+<p>可以让类实现这个接口</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_XKnDtQTrOg.png"></p>
+<p>使用implements关键字来实现接口 同时，实现接口时 同样需要将接口中所有的抽象方法全部实现</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Mi3dRuJec5.png"></p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_VYKUj3sDfz.png"></p>
+<p>接口不同于继承 接口可以同时实现多个</p>
+<p>接口和抽象类一样 不能直接创建对象 但是我们可以将接口实现类的对象以接口的形式去使用</p>
+<p>当作接口使用时 只有接口中定义的方法和Object类中的方法 无法使用类本身的方法和父类的方法</p>
+<p>接口支持向下转型</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_t5x_hrFIf_.png"></p>
+<p>从java8开始 接口中可以存在方法的默认实现</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_2z7mcR6wGT.png"></p>
+<p>接口不同与类 接口中不允许存在成员变量和成员方法 但是可以存在静态变量和静态方法 在接口中定义的变量只能是</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_mkUhySoCzX.png"></p>
+<p>跟普通的类一样 直接通过接口名的方式使用静态内容</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_Cfg6YsxbRN.png"></p>
+<p>接口的继承</p>
+<p>直接举个例子 创建接口A，B</p>
+<p>接口A继承接口B</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_kVHp-KRuoy.png"></p>
+<p>接口B</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_iMSgboAx_h.png"></p>
+<p>调用</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_4iZihT0cXY.png"></p>
+<p>接口继承也可以实现多继承</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_cTXM1Qavac.png"></p>
+<h3 id="枚举类"><a href="#枚举类" class="headerlink" title="枚举类"></a>枚举类</h3><p>假设现在有个学生叫小明 我们想给小明添加一个状态(比如跑步，学习，睡觉) 外部可以实时获取小明的状态</p>
+<p>例子</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_eFMqoRgQcT.png"></p>
+<p>封装</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_vK7rQLdbSb.png"></p>
+<p>但是现在会出现一个问题 如果我们仅仅是存储字符串 外部可以不按照我们规则 传入一些其他的字符串 这是不够严谨的 比如我们定义 “玩” 但很显然这并不属于小明的状态</p>
+<p>那么有没有一种方法 能够更好的去实现这样的状态标记 希望的状态是开发者拿到使用的就是我们预先定义好的状态 这样可以使用枚举类来完成</p>
+<p>枚举类</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_4gaYdrowm9.png"></p>
+<p>使用非常的方便</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_mIQwtKGvMh.png"></p>
+<p>别人在使用的时候 很清楚的看到我们支持哪些状态</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_wNvv38gaAg.png"></p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_PcrnsbZbvM.png"></p>
+<p>枚举类就是普通的类 我们也可以给枚举类型添加独有的成员方法</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_NutWOwtLvT.png"></p>
+<p>这样 枚举就可以按照我们想要的中文名称打印</p>
+<p><img src="/2023/01/05/javase(2)/%E5%9B%BE%E7%89%87_7tvmMLk6L6.png"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/12/21/yii2.0.37%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" rel="prev" title="Yii2.0.37代码审计(CVE-2020-15148反序列化)">
+      <i class="fa fa-chevron-left"></i> Yii2.0.37代码审计(CVE-2020-15148反序列化)
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%92%8C%E5%AF%B9%E8%B1%A1"><span class="nav-number">1.</span> <span class="nav-text">类和对象</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B1%BB%E4%B8%8E%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9B%E5%BB%BA"><span class="nav-number">1.1.</span> <span class="nav-text">类与对象的创建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E8%B1%A1%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">1.2.</span> <span class="nav-text">对象的使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E7%9A%84%E5%88%9B%E5%BB%BA%E5%92%8C%E4%BD%BF%E7%94%A8"><span class="nav-number">1.3.</span> <span class="nav-text">方法的创建和使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E8%BF%9B%E9%98%B6"><span class="nav-number">1.4.</span> <span class="nav-text">方法进阶</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95"><span class="nav-number">1.5.</span> <span class="nav-text">构造方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E5%8F%98%E9%87%8F%E5%92%8C%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95"><span class="nav-number">1.6.</span> <span class="nav-text">静态变量和静态方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%85%E5%92%8C%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6"><span class="nav-number">2.</span> <span class="nav-text">包和访问控制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8C%85%E5%A3%B0%E6%98%8E%E5%92%8C%E5%AF%BC%E5%85%A5"><span class="nav-number">2.1.</span> <span class="nav-text">包声明和导入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6%E6%9D%83%E9%99%90"><span class="nav-number">2.2.</span> <span class="nav-text">访问控制权限</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%81%E8%A3%85-%E7%BB%A7%E6%89%BF%E5%92%8C%E5%A4%9A%E6%80%81"><span class="nav-number">3.</span> <span class="nav-text">封装 继承和多态</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B1%BB%E7%9A%84%E5%B0%81%E8%A3%85"><span class="nav-number">3.1.</span> <span class="nav-text">类的封装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B1%BB%E7%9A%84%E7%BB%A7%E6%89%BF"><span class="nav-number">3.2.</span> <span class="nav-text">类的继承</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Object%E7%B1%BB"><span class="nav-number">3.3.</span> <span class="nav-text">Object类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E7%9A%84%E9%87%8D%E5%86%99"><span class="nav-number">3.4.</span> <span class="nav-text">方法的重写</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8A%BD%E8%B1%A1%E7%B1%BB"><span class="nav-number">3.5.</span> <span class="nav-text">抽象类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8E%A5%E5%8F%A3"><span class="nav-number">3.6.</span> <span class="nav-text">接口</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE%E7%B1%BB"><span class="nav-number">4.</span> <span class="nav-text">枚举类</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lzer0Kx"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lzer0Kx</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaobaiakai" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaobaiakai" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lzer0Kx</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
